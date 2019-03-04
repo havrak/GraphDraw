@@ -53,7 +53,7 @@ public class FXMLDocumentController implements Initializable {
 
 	private PostfixExperssionCacl pec;
 	private HashMap< ArrayList<String>, String> parsedExpression = new HashMap<>();
-	private ArrayList<Color> parsedExpresionColor = new ArrayList<Color>(); // muze se rozejit s hashmapou
+	private ArrayList<Color> parsedExpresionColor = new ArrayList<Color>();
 	private CustomColorDialog colorDialog;
 	private GraphicsContext gc;
 	public String function;
@@ -193,7 +193,7 @@ public class FXMLDocumentController implements Initializable {
 				int i = 0;
 				for (Entry<ArrayList<String>, String> e : parsedExpression.entrySet()) {
 					if(pec.getPostfixFunctionArray().containsKey(e.getKey())){
-						ArrayList<Color> temp = new ArrayList<Color>(parsedExpresionColor.subList(0,i));
+						ArrayList<Color> temp = new ArrayList<>(parsedExpresionColor.subList(0,i));
 						temp.add((Color) gc.getStroke());
 						temp.addAll(parsedExpresionColor.subList(i+1,parsedExpresionColor.size()));
 						parsedExpresionColor = temp;
@@ -290,7 +290,7 @@ public class FXMLDocumentController implements Initializable {
 	}
 
 	public void reDrawFunctions() {
-		int j = parsedExpresionColor.size() - 1;
+		int j = parsedExpresionColor.size()-1;
 		for (Entry<ArrayList<String>, String> e : parsedExpression.entrySet()) {
 			gc.setStroke(parsedExpresionColor.get(j));
 			pec.setPostfixExpression(e);
