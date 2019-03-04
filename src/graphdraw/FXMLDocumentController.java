@@ -53,7 +53,7 @@ public class FXMLDocumentController implements Initializable {
 
 	private PostfixExperssionCacl pec;
 	private HashMap< ArrayList<String>, String> parsedExpression = new HashMap<>();
-	private ArrayList<Color> parsedExpresionColor = new ArrayList<Color>();
+	private ArrayList<Color> parsedExpresionColor = new ArrayList<Color>(); // muze se rozejit s hashmapou
 	private CustomColorDialog colorDialog;
 	private GraphicsContext gc;
 	public String function;
@@ -168,6 +168,7 @@ public class FXMLDocumentController implements Initializable {
 	@FXML
 	private void drawGraphAction(KeyEvent event) throws IOException {
 		if (event.getCode().equals(KeyCode.ENTER)) {
+			int sizeOfpe = parsedExpression.size();
 			System.out.println("started calculation zoom: " + zoom);
 			double time = System.nanoTime();
 			PointsCoordinates coordinates = new PointsCoordinates(new ArrayList<>(), new ArrayList<>());
@@ -186,7 +187,21 @@ public class FXMLDocumentController implements Initializable {
 			}
 			pec.getPostfixFunctionArray();
 			parsedExpression.putAll(pec.getPostfixFunctionArray());
-			parsedExpresionColor.add((Color) gc.getStroke());
+			if (sizeOfpe == parsedExpression.size() - 1) {
+				parsedExpresionColor.add((Color) gc.getStroke());
+			} else { // je potreba zmenit barvu pro funkci - aby se ArrayList A HashMap nerozesly
+				int i = 0;
+				for (Entry<ArrayList<String>, String> e : parsedExpression.entrySet()) {
+					if(pec.getPostfixFunctionArray().containsKey(e.getKey())){
+						ArrayList<Color> temp = new ArrayList<Color>(parsedExpresionColor.subList(0,i));
+						temp.add((Color) gc.getStroke());
+						temp.addAll(parsedExpresionColor.subList(i+1,parsedExpresionColor.size()));
+						parsedExpresionColor = temp;
+					}
+					i++;
+				}
+			}
+			System.out.println("saved expressions: "+parsedExpression + ", theirs colors: "+parsedExpresionColor);
 			System.out.println("Time: " + (System.nanoTime() - time) / 1000_000 + "ms");
 			drawToCanvas(coordinates);
 
@@ -232,7 +247,7 @@ public class FXMLDocumentController implements Initializable {
 	public void canvasMouseMoved(MouseEvent event) {
 		if (pec != null) {
 			double x = (event.getX() - Canvas.getWidth() / 2) / zoom;
-			Double y = pec.evaluateExpression(x); // bude zobrazovat chyby
+			Double y = pec.evaluateExpression(x);
 			Paint c = gc.getStroke();
 			gc.fillRect(Canvas.getWidth() - 95, Canvas.getHeight() - 60, Canvas.getWidth(), 34);
 			gc.setStroke(Color.BLACK);
