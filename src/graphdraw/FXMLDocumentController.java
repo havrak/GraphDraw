@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import javafx.embed.swing.SwingFXUtils;
@@ -49,8 +51,8 @@ public class FXMLDocumentController implements Initializable {
 	private TextField Variable;
 
 	private PostfixExperssionCacl pec;
-	private HashMap< ArrayList<String>, String> parsedExpression = new HashMap<>();
-	private ArrayList<Color> parsedExpresionColor = new ArrayList<Color>();
+	private Map< ArrayList<String>, String> parsedExpression = new HashMap<>();
+	private List<Color> parsedExpresionColor = new ArrayList<Color>();
 	private CustomColorDialog colorDialog;
 	private GraphicsContext gc;
 	public String function;
@@ -198,13 +200,9 @@ public class FXMLDocumentController implements Initializable {
 				parsedExpresionColor.add((Color) gc.getStroke());
 			} else { // je potreba zmenit barvu pro funkci - aby se ArrayList A HashMap nerozesly 
 				int i = 0;
-				for (Entry<ArrayList<String>, String> e : parsedExpression.entrySet()) { // nefunguje meni se spatna barva
+				for (Entry<ArrayList<String>, String> e : parsedExpression.entrySet()) {
 					if (pec.getPostfixFunctionArray().containsKey(e.getKey())) {
-						System.out.println("Change color saved expressions: " + parsedExpression + ", theirs colors: " + parsedExpresionColor);
-						System.out.println("asdsad: "+parsedExpresionColor.get(parsedExpresionColor.size()-1-i));
-						parsedExpresionColor.remove(parsedExpresionColor.size()-1-i);
-						parsedExpresionColor.add(parsedExpresionColor.size()-i, (Color) gc.getStroke());
-						System.out.println("Change color saved expressions: " + parsedExpression + ", theirs colors: " + parsedExpresionColor);
+						parsedExpresionColor.set(parsedExpresionColor.size()-1-i, (Color) gc.getStroke());
 					}
 					i++;
 				}

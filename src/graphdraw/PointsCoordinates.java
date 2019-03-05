@@ -8,14 +8,12 @@ import java.util.ArrayList;
  */
 public class PointsCoordinates {
 
-    private final ArrayList<Integer> axisX;
-    private final ArrayList<Integer> axisY;
-    //private final int zoom;
+    private ArrayList<Integer> axisX= new ArrayList<>();
+    private ArrayList<Integer> axisY = new ArrayList<>();
 
     public PointsCoordinates(ArrayList<Integer> axisX, ArrayList<Integer> axisY) {
         this.axisX = axisX;
         this.axisY = axisY;
-    //    this.zoom = zoom;
     }
 
     public void AddToMap(double x, double y) {
