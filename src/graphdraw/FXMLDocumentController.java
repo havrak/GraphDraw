@@ -2,15 +2,12 @@ package graphdraw;
 
 import com.sun.javafx.scene.control.skin.CustomColorDialog;
 import graphdraw.PostfixExperssionCacl.PostfixExperssionCacl;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -22,12 +19,12 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
@@ -159,6 +156,17 @@ public class FXMLDocumentController implements Initializable {
 	}
 
 	@FXML
+	private void canvasScroll(ScrollEvent event) {
+		double scroll = event.getDeltaY()/15;
+		if ((zoom + scroll) < 101 && (zoom + scroll) >= 10) {
+			zoom+=scroll;
+			ZoomDisplay.setText(String.valueOf(zoom));
+			reset();
+			reDrawFunctions();
+		}
+	}
+
+	@FXML
 	private void specValueAction(KeyEvent event) {
 		if (event.getCode().equals(KeyCode.ENTER)) {
 			VariableText.setText("For value: " + VariableText.getText() + ", f(" + Variable.getText() + ") = " + String.valueOf(pec.evaluateExpression(Double.valueOf(VariableText.getText()))));
@@ -192,16 +200,16 @@ public class FXMLDocumentController implements Initializable {
 			} else { // je potreba zmenit barvu pro funkci - aby se ArrayList A HashMap nerozesly
 				int i = 0;
 				for (Entry<ArrayList<String>, String> e : parsedExpression.entrySet()) {
-					if(pec.getPostfixFunctionArray().containsKey(e.getKey())){
-						ArrayList<Color> temp = new ArrayList<>(parsedExpresionColor.subList(0,i));
+					if (pec.getPostfixFunctionArray().containsKey(e.getKey())) {
+						ArrayList<Color> temp = new ArrayList<>(parsedExpresionColor.subList(0, i));
 						temp.add((Color) gc.getStroke());
-						temp.addAll(parsedExpresionColor.subList(i+1,parsedExpresionColor.size()));
+						temp.addAll(parsedExpresionColor.subList(i + 1, parsedExpresionColor.size()));
 						parsedExpresionColor = temp;
 					}
 					i++;
 				}
 			}
-			System.out.println("saved expressions: "+parsedExpression + ", theirs colors: "+parsedExpresionColor);
+			System.out.println("saved expressions: " + parsedExpression + ", theirs colors: " + parsedExpresionColor);
 			System.out.println("Time: " + (System.nanoTime() - time) / 1000_000 + "ms");
 			drawToCanvas(coordinates);
 
@@ -258,7 +266,6 @@ public class FXMLDocumentController implements Initializable {
 			} else {
 				sty = "Y: Error";
 			}
-
 			if (sty.length() > 13) {
 				sty = "Y: TooLarge";
 			}
@@ -290,7 +297,7 @@ public class FXMLDocumentController implements Initializable {
 	}
 
 	public void reDrawFunctions() {
-		int j = parsedExpresionColor.size()-1;
+		int j = parsedExpresionColor.size() - 1;
 		for (Entry<ArrayList<String>, String> e : parsedExpression.entrySet()) {
 			gc.setStroke(parsedExpresionColor.get(j));
 			pec.setPostfixExpression(e);
