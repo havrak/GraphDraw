@@ -29,6 +29,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
@@ -52,7 +53,7 @@ public class FXMLDocumentController implements Initializable {
 
 	private PostfixExperssionCacl pec;
 	private Map< ArrayList<String>, String> parsedExpression = new HashMap<>();
-	private List<Color> parsedExpresionColor = new ArrayList<Color>();
+	private List<Color> parsedExpresionColor = new ArrayList<>();
 	private CustomColorDialog colorDialog;
 	private GraphicsContext gc;
 	public String function;
@@ -63,6 +64,7 @@ public class FXMLDocumentController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		gc = Canvas.getGraphicsContext2D();
+		gc.setFont(new Font(10));
 		reset();
 		zoom = 10;
 		ZoomDisplay.setText("10");
@@ -105,7 +107,7 @@ public class FXMLDocumentController implements Initializable {
 		function = "";
 		VariableText.setText("");
 		parsedExpression = new HashMap<>();
-		parsedExpresionColor = new ArrayList<Color>();
+		parsedExpresionColor = new ArrayList<>();
 		pec = new PostfixExperssionCacl(function, variable);
 	}
 
@@ -162,9 +164,13 @@ public class FXMLDocumentController implements Initializable {
 
 	@FXML
 	private void canvasScroll(ScrollEvent event) {
-		double scroll = event.getDeltaY() / 15;
-		if ((zoom + scroll) < 101 && (zoom + scroll) >= 10) {
-			zoom += scroll;
+		if (event.getDeltaY() < 0 && zoom > 10) {
+			zoom--;
+			ZoomDisplay.setText(String.valueOf(zoom));
+			reset();
+			reDrawFunctions();
+		} else if (event.getDeltaY() > 0 && zoom < 100) {
+			zoom++;
 			ZoomDisplay.setText(String.valueOf(zoom));
 			reset();
 			reDrawFunctions();
@@ -197,11 +203,11 @@ public class FXMLDocumentController implements Initializable {
 					coordinates.AddToMap(i * zoom, d);
 				}
 			}
-			pec.getPostfixFunctionArray();
 			parsedExpression.putAll(pec.getPostfixFunctionArray());
 			if (sizeOfpe == parsedExpression.size() - 1) {
 				parsedExpresionColor.add((Color) gc.getStroke());
 				drawToCanvas(coordinates);
+				drawScale();
 			} else { // je potreba zmenit barvu pro funkci - aby se ArrayList A HashMap nerozesly 
 				int i = 0;
 				for (Entry<ArrayList<String>, String> e : parsedExpression.entrySet()) {
@@ -217,7 +223,7 @@ public class FXMLDocumentController implements Initializable {
 			System.out.println("Time: " + (System.nanoTime() - time) / 1000_000 + "ms");
 		}
 	}
-	
+
 	@FXML
 	private void btnColorAction(Event event) {
 		colorDialog.getDialog().showAndWait();
@@ -313,6 +319,22 @@ public class FXMLDocumentController implements Initializable {
 			}
 			j--;
 			drawToCanvas(coordinates);
+			drawScale();
+		}
+
+	}
+
+	public void drawScale() { // pri velkem zoom se splini podminka vicekrat
+		double realX = 0;
+		for (double x = -(Canvas.getWidth() / (2 * zoom)); x < (Canvas.getWidth() / (2 * zoom)); x += (0.1 / (double) zoom)) {
+			double distanceFromZero = Math.abs(Math.round(realX) - Canvas.getWidth() / 2);
+			//System.out.println(" x is: " + x + " realX is: " + realX);
+			if (distanceFromZero > 25 && (Math.abs(Math.round(x * 100)) == 50 || Math.abs(Math.round(x * 100)) == 100 || Math.abs(Math.round(x * 100)) == 200 || Math.abs(Math.round(x * 100)) == 500 || Math.abs(Math.round(x * 100)) == 1000|| Math.abs(Math.round(x * 100)) == 3000)) {
+			//	System.out.println("Stroking: " + Math.round(x * 100) / 100 + " x is: " + x + " realX is: " + realX);
+				gc.strokeText(String.valueOf(Math.round(x * 100) / 100), realX, Canvas.getHeight()/2+14);
+				gc.strokeLine(realX, Canvas.getHeight()/2+5, realX, Canvas.getHeight()/2-5);
+			}
+			realX += 0.1;
 		}
 
 	}
