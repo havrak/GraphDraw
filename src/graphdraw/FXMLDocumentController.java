@@ -81,7 +81,7 @@ public class FXMLDocumentController implements Initializable {
 		alert.setHeaderText("Informace o požití");
 		alert.setContentText("Zadejte promenou do policka v levem hornim rohu a funkci do vedlejsiho policka, pro zobrazení grafu stiskněte ENTER\n"
 				+ "- proměná může být jakékoliv písmeno až na písmeno e, neboť to náleží kontantě e (e \u2250 2,71)\n"
-				+ "- pro sin zadejte:sin(VÝRAZ)\n"
+				+ "- pro sin zadejte: sin(VÝRAZ)\n"
 				+ "- pro asin zadejte: asin(VÝRAZ)\n"
 				+ "- pro cos zadejte: cos(VÝRAZ)\n"
 				+ "- pro acos zadejte: acos(VÝRAZ)\n"
@@ -104,6 +104,9 @@ public class FXMLDocumentController implements Initializable {
 		variable = "";
 		function = "";
 		VariableText.setText("");
+		parsedExpression = new HashMap<>();
+		parsedExpresionColor = new ArrayList<Color>();
+		pec = new PostfixExperssionCacl(function, variable);
 	}
 
 	@FXML
@@ -198,25 +201,23 @@ public class FXMLDocumentController implements Initializable {
 			parsedExpression.putAll(pec.getPostfixFunctionArray());
 			if (sizeOfpe == parsedExpression.size() - 1) {
 				parsedExpresionColor.add((Color) gc.getStroke());
+				drawToCanvas(coordinates);
 			} else { // je potreba zmenit barvu pro funkci - aby se ArrayList A HashMap nerozesly 
 				int i = 0;
 				for (Entry<ArrayList<String>, String> e : parsedExpression.entrySet()) {
 					if (pec.getPostfixFunctionArray().containsKey(e.getKey())) {
-						parsedExpresionColor.set(parsedExpresionColor.size()-1-i, (Color) gc.getStroke());
+						parsedExpresionColor.set(parsedExpresionColor.size() - 1 - i, (Color) gc.getStroke());
 					}
 					i++;
 				}
 				reset();
-				reDrawFunctions(); // diky antiAnalysing zmena barvy
+				reDrawFunctions(); // diky antiAnalysing zmena barvy je nutne vykreslit nove a ne pres sebe
 			}
 			System.out.println("saved expressions: " + parsedExpression + ", theirs colors: " + parsedExpresionColor);
 			System.out.println("Time: " + (System.nanoTime() - time) / 1000_000 + "ms");
-			drawToCanvas(coordinates);
-
 		}
-
 	}
-
+	
 	@FXML
 	private void btnColorAction(Event event) {
 		colorDialog.getDialog().showAndWait();
