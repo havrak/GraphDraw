@@ -42,7 +42,7 @@
    <center>
       <ScrollPane BorderPane.alignment="CENTER">
          <content>
-            <Canvas fx:id="Canvas" height="600.0" onMouseMoved="#canvasMouseMoved" width="827.0" />
+            <Canvas fx:id="Canvas" height="600.0" onMouseMoved="#canvasMouseMoved" onScroll="#canvasScroll" width="827.0" />
          </content>
       </ScrollPane>
    </center>

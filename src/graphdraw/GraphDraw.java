@@ -20,7 +20,7 @@ public class GraphDraw extends Application {
         Scene scene = new Scene(root, 827,900);
         ((FXMLDocumentController)loader.getController()).setStage(stage);
         stage.setTitle("GraphDrawing");
-	stage.getIcons().add(new Image("icon.png"));
+		stage.getIcons().add(new Image("icon.png"));
         stage.setScene(scene);
         stage.show();
 		stage.setMinHeight(678);

@@ -66,6 +66,7 @@ public class FXMLDocumentController implements Initializable {
 		gc = Canvas.getGraphicsContext2D();
 		gc.setFont(new Font(10));
 		reset();
+		drawScale();
 		zoom = 10;
 		ZoomDisplay.setText("10");
 
@@ -324,17 +325,26 @@ public class FXMLDocumentController implements Initializable {
 
 	}
 
-	public void drawScale() { // pri velkem zoom se splini podminka vicekrat
+	public void drawScale() {
 		double realX = 0;
 		for (double x = -(Canvas.getWidth() / (2 * zoom)); x < (Canvas.getWidth() / (2 * zoom)); x += (0.1 / (double) zoom)) {
 			double distanceFromZero = Math.abs(Math.round(realX) - Canvas.getWidth() / 2);
-			//System.out.println(" x is: " + x + " realX is: " + realX);
-			if (distanceFromZero > 25 && (Math.abs(Math.round(x * 100)) == 50 || Math.abs(Math.round(x * 100)) == 100 || Math.abs(Math.round(x * 100)) == 200 || Math.abs(Math.round(x * 100)) == 500 || Math.abs(Math.round(x * 100)) == 1000|| Math.abs(Math.round(x * 100)) == 3000)) {
-			//	System.out.println("Stroking: " + Math.round(x * 100) / 100 + " x is: " + x + " realX is: " + realX);
-				gc.strokeText(String.valueOf(Math.round(x * 100) / 100), realX, Canvas.getHeight()/2+14);
-				gc.strokeLine(realX, Canvas.getHeight()/2+5, realX, Canvas.getHeight()/2-5);
+			double tempX = Math.abs(Math.round(x * 1000));
+			if (distanceFromZero > 25 && (tempX == 500 || tempX == 1000 || tempX == 2000 || tempX == 5000 || tempX == 10000 || tempX == 30000)) {
+				gc.strokeText(String.valueOf(Math.round(x * 1000) / 1000.), realX, Canvas.getHeight() / 2 + 14);
+				gc.strokeLine(realX, Canvas.getHeight() / 2 + 5, realX, Canvas.getHeight() / 2 - 5);
 			}
 			realX += 0.1;
+		}
+		double realY = 0;
+		for (double y = -(Canvas.getHeight()/ (2 * zoom)); y < (Canvas.getHeight()/ (2 * zoom)); y += (0.1 / (double) zoom)) {
+			double distanceFromZero = Math.abs(Math.round(realY) - Canvas.getHeight() / 2);
+			double tempY = Math.abs(Math.round(y * 1000));
+			if (distanceFromZero > 25 && (tempY == 500 || tempY == 1000 || tempY == 2000 || tempY == 5000 || tempY == 10000 || tempY == 30000)) {
+				gc.strokeText(String.valueOf(Math.round(y * 1000) / 1000.),Canvas.getWidth()/ 2 - 34,realY);
+				gc.strokeLine(Canvas.getWidth()/ 2 + 5, realY, Canvas.getWidth()/ 2 - 5, realY);
+			}
+			realY += 0.1;
 		}
 
 	}

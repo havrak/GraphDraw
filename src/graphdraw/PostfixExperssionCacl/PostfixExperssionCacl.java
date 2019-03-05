@@ -127,7 +127,6 @@ public class PostfixExperssionCacl {
 				default:
 					break;
 			}
-			System.out.println("postfix: " + postfixFunctionArray + ", oprator stack: " + stack.getStack());
 
 		}
 		infixFunction = infixFunction.substring(0, infixFunction.length() - 1);
