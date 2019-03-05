@@ -157,9 +157,9 @@ public class FXMLDocumentController implements Initializable {
 
 	@FXML
 	private void canvasScroll(ScrollEvent event) {
-		double scroll = event.getDeltaY()/15;
+		double scroll = event.getDeltaY() / 15;
 		if ((zoom + scroll) < 101 && (zoom + scroll) >= 10) {
-			zoom+=scroll;
+			zoom += scroll;
 			ZoomDisplay.setText(String.valueOf(zoom));
 			reset();
 			reDrawFunctions();
@@ -177,7 +177,6 @@ public class FXMLDocumentController implements Initializable {
 	private void drawGraphAction(KeyEvent event) throws IOException {
 		if (event.getCode().equals(KeyCode.ENTER)) {
 			int sizeOfpe = parsedExpression.size();
-			System.out.println("started calculation zoom: " + zoom);
 			double time = System.nanoTime();
 			PointsCoordinates coordinates = new PointsCoordinates(new ArrayList<>(), new ArrayList<>());
 
@@ -197,17 +196,20 @@ public class FXMLDocumentController implements Initializable {
 			parsedExpression.putAll(pec.getPostfixFunctionArray());
 			if (sizeOfpe == parsedExpression.size() - 1) {
 				parsedExpresionColor.add((Color) gc.getStroke());
-			} else { // je potreba zmenit barvu pro funkci - aby se ArrayList A HashMap nerozesly
+			} else { // je potreba zmenit barvu pro funkci - aby se ArrayList A HashMap nerozesly 
 				int i = 0;
-				for (Entry<ArrayList<String>, String> e : parsedExpression.entrySet()) {
+				for (Entry<ArrayList<String>, String> e : parsedExpression.entrySet()) { // nefunguje meni se spatna barva
 					if (pec.getPostfixFunctionArray().containsKey(e.getKey())) {
-						ArrayList<Color> temp = new ArrayList<>(parsedExpresionColor.subList(0, i));
-						temp.add((Color) gc.getStroke());
-						temp.addAll(parsedExpresionColor.subList(i + 1, parsedExpresionColor.size()));
-						parsedExpresionColor = temp;
+						System.out.println("Change color saved expressions: " + parsedExpression + ", theirs colors: " + parsedExpresionColor);
+						System.out.println("asdsad: "+parsedExpresionColor.get(parsedExpresionColor.size()-1-i));
+						parsedExpresionColor.remove(parsedExpresionColor.size()-1-i);
+						parsedExpresionColor.add(parsedExpresionColor.size()-i, (Color) gc.getStroke());
+						System.out.println("Change color saved expressions: " + parsedExpression + ", theirs colors: " + parsedExpresionColor);
 					}
 					i++;
 				}
+				reset();
+				reDrawFunctions(); // diky antiAnalysing zmena barvy
 			}
 			System.out.println("saved expressions: " + parsedExpression + ", theirs colors: " + parsedExpresionColor);
 			System.out.println("Time: " + (System.nanoTime() - time) / 1000_000 + "ms");
