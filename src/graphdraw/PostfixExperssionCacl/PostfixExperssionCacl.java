@@ -1,5 +1,7 @@
 package graphdraw.PostfixExperssionCacl;
 
+import graphdraw.ParsedExpressions;
+import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -209,7 +211,7 @@ public class PostfixExperssionCacl {
 				isExpressionCalculable = false;
 				return Double.NaN;
 			}
-		}else{
+		} else {
 			return Double.NaN;
 		}
 	}
@@ -222,16 +224,13 @@ public class PostfixExperssionCacl {
 
 	}
 
-	public void setPostfixExpression(Entry<ArrayList<String>, String> h) {
-		this.variable = h.getValue();
-		this.postfixFunctionArray = h.getKey();
+	public void setPostfixExpression(ArrayList<String> postfixFunctionArray, String variable) {
+		this.variable =variable;
+		this.postfixFunctionArray = postfixFunctionArray;
 		isExpressionCalculable = true;
-
 	}
-
-	public HashMap<ArrayList<String>, String> getPostfixFunctionArray() {
-		HashMap<ArrayList<String>, String> h = new HashMap();
-		h.put(postfixFunctionArray, variable);
-		return h;
+	
+	public ParsedExpressions getParsedExpression() {
+		return new ParsedExpressions(Color.BLACK, postfixFunctionArray, variable);
 	}
 }

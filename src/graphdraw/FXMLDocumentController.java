@@ -38,7 +38,7 @@ import javax.imageio.ImageIO;
  *
  * @author havra
  */
-public class FXMLDocumentController implements Initializable {
+public class FXMLDocumentController {
 
 	@FXML
 	private Canvas Canvas;
@@ -52,8 +52,7 @@ public class FXMLDocumentController implements Initializable {
 	private TextField Variable;
 
 	private PostfixExperssionCacl pec;
-	private Map< ArrayList<String>, String> parsedExpression = new HashMap<>();
-	private List<Color> parsedExpresionColor = new ArrayList<>();
+	private ParsedExpressions p = new ParsedExpressions();
 	private CustomColorDialog colorDialog;
 	private GraphicsContext gc;
 	public String function;
@@ -61,20 +60,14 @@ public class FXMLDocumentController implements Initializable {
 	private Stage stage;
 	private int zoom;
 
-	@Override
-	public void initialize(URL location, ResourceBundle resources) {
-		gc = Canvas.getGraphicsContext2D();
-		gc.setFont(new Font(10));
-		reset();
-		drawScale();
-		zoom = 10;
-		ZoomDisplay.setText("10");
-
-	}
-
 	public void setStage(Stage stage) {
 		this.stage = stage;
 		this.colorDialog = new CustomColorDialog(this.stage);
+		gc = Canvas.getGraphicsContext2D();
+		gc.setFont(new Font(10));
+		reset();
+		zoom = 10;
+		ZoomDisplay.setText("10");
 	}
 
 	@FXML
@@ -82,7 +75,7 @@ public class FXMLDocumentController implements Initializable {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle("Informace o použití");
 		alert.setHeaderText("Informace o požití");
-		alert.setContentText("Zadejte promenou do policka v levem hornim rohu a funkci do vedlejsiho policka, pro zobrazení grafu stiskněte ENTER\n"
+		alert.setContentText("Zadejte proměnou do políčka v levém horném rohu a funkci do vedlejšího políčka, pro zobrazení grafu stiskněte ENTER\n"
 				+ "- proměná může být jakékoliv písmeno až na písmeno e, neboť to náleží kontantě e (e \u2250 2,71)\n"
 				+ "- pro sin zadejte: sin(VÝRAZ)\n"
 				+ "- pro asin zadejte: asin(VÝRAZ)\n"
@@ -107,8 +100,7 @@ public class FXMLDocumentController implements Initializable {
 		variable = "";
 		function = "";
 		VariableText.setText("");
-		parsedExpression = new HashMap<>();
-		parsedExpresionColor = new ArrayList<>();
+		p = new ParsedExpressions();
 		pec = new PostfixExperssionCacl(function, variable);
 	}
 
@@ -188,7 +180,6 @@ public class FXMLDocumentController implements Initializable {
 	@FXML
 	private void drawGraphAction(KeyEvent event) throws IOException {
 		if (event.getCode().equals(KeyCode.ENTER)) {
-			int sizeOfpe = parsedExpression.size();
 			double time = System.nanoTime();
 			PointsCoordinates coordinates = new PointsCoordinates(new ArrayList<>(), new ArrayList<>());
 
@@ -204,23 +195,18 @@ public class FXMLDocumentController implements Initializable {
 					coordinates.AddToMap(i * zoom, d);
 				}
 			}
-			parsedExpression.putAll(pec.getPostfixFunctionArray());
-			if (sizeOfpe == parsedExpression.size() - 1) {
-				parsedExpresionColor.add((Color) gc.getStroke());
-				drawToCanvas(coordinates);
+			// funguje 
+			ParsedExpressions temp = pec.getParsedExpression();
+			temp.ChangeColorAtIndex1((Color) gc.getStroke());
+			if(p.addNewEntry(temp)){ // diky antiAnalysing zmena barvy je nutne vykreslit nove a ne pres sebe
+				reDrawFunctions();
 				drawScale();
-			} else { // je potreba zmenit barvu pro funkci - aby se ArrayList A HashMap nerozesly 
-				int i = 0;
-				for (Entry<ArrayList<String>, String> e : parsedExpression.entrySet()) {
-					if (pec.getPostfixFunctionArray().containsKey(e.getKey())) {
-						parsedExpresionColor.set(parsedExpresionColor.size() - 1 - i, (Color) gc.getStroke());
-					}
-					i++;
-				}
-				reset();
-				reDrawFunctions(); // diky antiAnalysing zmena barvy je nutne vykreslit nove a ne pres sebe
-			}
-			System.out.println("saved expressions: " + parsedExpression + ", theirs colors: " + parsedExpresionColor);
+			}else{
+				drawToCanvas(coordinates);
+			};
+			System.out.println("-----------------");
+			System.out.println(p.toString());
+			System.out.println("-----------------");
 			System.out.println("Time: " + (System.nanoTime() - time) / 1000_000 + "ms");
 		}
 	}
@@ -305,20 +291,18 @@ public class FXMLDocumentController implements Initializable {
 	}
 
 	public void reDrawFunctions() {
-		int j = parsedExpresionColor.size() - 1;
-		for (Entry<ArrayList<String>, String> e : parsedExpression.entrySet()) {
-			gc.setStroke(parsedExpresionColor.get(j));
-			pec.setPostfixExpression(e);
+		for (int i = 0; i < p.getSize(); i++) {
+			gc.setStroke(p.getColor(i));
+			pec.setPostfixExpression(p.getPostfixExpression(i), p.getVariable(i));
 			PointsCoordinates coordinates = new PointsCoordinates(new ArrayList<>(), new ArrayList<>());
-			for (double i = -(Canvas.getWidth() / (2 * zoom)); i < (Canvas.getWidth() / (2 * zoom)); i += (0.1 / (double) zoom)) {
-				Double d = pec.evaluateExpression(i) * zoom;
+			for (double x = -(Canvas.getWidth() / (2 * zoom)); x < (Canvas.getWidth() / (2 * zoom)); x += (0.1 / (double) zoom)) {
+				Double d = pec.evaluateExpression(x) * zoom;
 				if (d.isNaN()) {
-					i = Double.POSITIVE_INFINITY;
+					x = Double.POSITIVE_INFINITY;
 				} else {
-					coordinates.AddToMap(i * zoom, d);
+					coordinates.AddToMap(x * zoom, d);
 				}
 			}
-			j--;
 			drawToCanvas(coordinates);
 			drawScale();
 		}
@@ -326,6 +310,8 @@ public class FXMLDocumentController implements Initializable {
 	}
 
 	public void drawScale() {
+		Paint p = gc.getStroke();
+		gc.setStroke(Color.BLACK);
 		double realX = 0;
 		for (double x = -(Canvas.getWidth() / (2 * zoom)); x < (Canvas.getWidth() / (2 * zoom)); x += (0.1 / (double) zoom)) {
 			double distanceFromZero = Math.abs(Math.round(realX) - Canvas.getWidth() / 2);
@@ -337,16 +323,16 @@ public class FXMLDocumentController implements Initializable {
 			realX += 0.1;
 		}
 		double realY = 0;
-		for (double y = -(Canvas.getHeight()/ (2 * zoom)); y < (Canvas.getHeight()/ (2 * zoom)); y += (0.1 / (double) zoom)) {
+		for (double y = -(Canvas.getHeight() / (2 * zoom)); y < (Canvas.getHeight() / (2 * zoom)); y += (0.1 / (double) zoom)) {
 			double distanceFromZero = Math.abs(Math.round(realY) - Canvas.getHeight() / 2);
 			double tempY = Math.abs(Math.round(y * 1000));
 			if (distanceFromZero > 25 && (tempY == 500 || tempY == 1000 || tempY == 2000 || tempY == 5000 || tempY == 10000 || tempY == 30000)) {
-				gc.strokeText(String.valueOf(Math.round(y * 1000) / 1000.),Canvas.getWidth()/ 2 - 34,realY);
-				gc.strokeLine(Canvas.getWidth()/ 2 + 5, realY, Canvas.getWidth()/ 2 - 5, realY);
+				gc.strokeText(String.valueOf(Math.round(y * 1000) / 1000.), Canvas.getWidth() / 2 - 34, realY);
+				gc.strokeLine(Canvas.getWidth() / 2 + 5, realY, Canvas.getWidth() / 2 - 5, realY);
 			}
 			realY += 0.1;
 		}
-
+		gc.setStroke(p);
 	}
 
 	public void reset() {
