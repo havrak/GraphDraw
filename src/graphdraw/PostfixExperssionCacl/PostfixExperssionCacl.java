@@ -39,7 +39,6 @@ public class PostfixExperssionCacl {
 			postfixFunctionArray.add("0");
 		}
 		for (int i = 0; i < infixFunction.length(); i++) {
-			System.out.println(infixFunction.charAt(i));
 			wasItALetter = false;
 			wasItADigit = false;
 			char c = infixFunction.charAt(i);

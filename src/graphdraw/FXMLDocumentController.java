@@ -38,7 +38,7 @@ public class FXMLDocumentController {
 	class ResizableCanvas extends Canvas {
 
 		public ResizableCanvas() {
-			widthProperty().addListener(evt -> draw()); // zmeni se sirka  a neni pridany gc
+			widthProperty().addListener(evt -> draw());
 			heightProperty().addListener(evt -> draw());
 		}
 
@@ -63,7 +63,6 @@ public class FXMLDocumentController {
 		}
 
 		public void bindWIthParent(Pane parent) {
-			System.out.println(parent);
 			parent.getChildren().add(this);
 			this.widthProperty().bind(parent.widthProperty());
 			this.heightProperty().bind(parent.heightProperty());
@@ -84,6 +83,7 @@ public class FXMLDocumentController {
 
 	private PostfixExperssionCacl pec;
 	private ParsedExpressions p = new ParsedExpressions();
+
 	private CustomColorDialog colorDialog;
 	private GraphicsContext gc;
 	public String function;
@@ -194,7 +194,7 @@ public class FXMLDocumentController {
 		}
 	}
 
-	EventHandler<ScrollEvent> canvasScroll= event ->{
+	EventHandler<ScrollEvent> canvasScroll = event -> {
 		if (event.getDeltaY() < 0 && zoom > 10) {
 			zoom--;
 			ZoomDisplay.setText(String.valueOf(zoom));
@@ -218,6 +218,7 @@ public class FXMLDocumentController {
 	@FXML
 	private void drawGraphAction(KeyEvent event) throws IOException {
 		if (event.getCode().equals(KeyCode.ENTER)) {
+			System.out.println("-----------------");
 			double time = System.nanoTime();
 			PointsCoordinates coordinates = new PointsCoordinates(new ArrayList<>(), new ArrayList<>());
 
@@ -241,7 +242,6 @@ public class FXMLDocumentController {
 			} else {
 				drawToCanvas(coordinates);
 			}
-			System.out.println("-----------------");
 			System.out.println(p.toString());
 			System.out.println("Time: " + (System.nanoTime() - time) / 1000_000 + "ms");
 			System.out.println("-----------------");
@@ -311,7 +311,7 @@ public class FXMLDocumentController {
 			gc.setStroke(c);
 		}
 	};
-	
+
 	public void drawToCanvas(PointsCoordinates coordinates) {
 		Point2D point1;
 		Point2D point2;
@@ -355,7 +355,7 @@ public class FXMLDocumentController {
 			for (double x = -(Canvas.getWidth() / (2 * zoom)); x < (Canvas.getWidth() / (2 * zoom)); x += (0.1 / (double) zoom)) {
 				double distanceFromZero = Math.abs(Math.round(realX) - Canvas.getWidth() / 2);
 				double tempX = Math.abs(Math.round(x * 1000));
-				if (distanceFromZero > 25 && (tempX == 500 || tempX == 1000 || tempX == 2000 || tempX == 5000 || tempX == 10000 || tempX == 20000 || tempX == 30000 || tempX == 50000|| tempX == 70000|| tempX == 100000)) {
+				if (distanceFromZero > 25 && (tempX == 500 || tempX == 1000 || tempX == 2000 || tempX == 5000 || tempX == 10000 || tempX == 20000 || tempX == 30000 || tempX == 50000 || tempX == 70000 || tempX == 100000)) {
 					gc.strokeText(String.valueOf(tempX / 1000.), realX, Canvas.getHeight() / 2 + 14);
 					gc.strokeLine(realX, Canvas.getHeight() / 2 + 5, realX, Canvas.getHeight() / 2 - 5);
 				}
@@ -365,7 +365,7 @@ public class FXMLDocumentController {
 			for (double y = -(Canvas.getHeight() / (2 * zoom)); y < (Canvas.getHeight() / (2 * zoom)); y += (0.1 / (double) zoom)) {
 				double distanceFromZero = Math.abs(Math.round(realY) - Canvas.getHeight() / 2);
 				double tempY = Math.abs(Math.round(y * 1000));
-				if (distanceFromZero > 25 && (tempY == 500 || tempY == 1000 || tempY == 2000 || tempY == 5000 || tempY == 10000 || tempY == 20000 || tempY == 30000 || tempY == 50000|| tempY == 70000|| tempY == 100000)) {
+				if (distanceFromZero > 25 && (tempY == 500 || tempY == 1000 || tempY == 2000 || tempY == 5000 || tempY == 10000 || tempY == 20000 || tempY == 30000 || tempY == 50000 || tempY == 70000 || tempY == 100000)) {
 					gc.strokeText(String.valueOf(tempY / 1000.), Canvas.getWidth() / 2 - 34, realY);
 					gc.strokeLine(Canvas.getWidth() / 2 + 5, realY, Canvas.getWidth() / 2 - 5, realY);
 				}
@@ -376,7 +376,7 @@ public class FXMLDocumentController {
 	}
 
 	public void reset() {
-		if (gc != null) {
+		if (gc != null) { // zavola se driv nez se prida gc
 			gc.setFill(Color.WHITE);
 			Color stroke = (Color) gc.getStroke();
 			gc.setStroke(Color.BLACK);
