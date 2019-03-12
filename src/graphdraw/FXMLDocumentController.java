@@ -4,18 +4,11 @@ import com.sun.javafx.scene.control.skin.CustomColorDialog;
 import graphdraw.PostfixExperssionCacl.PostfixExperssionCacl;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.ResourceBundle;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
@@ -68,6 +61,7 @@ public class FXMLDocumentController {
 		reset();
 		zoom = 10;
 		ZoomDisplay.setText("10");
+		drawScale();
 	}
 
 	@FXML
@@ -100,6 +94,7 @@ public class FXMLDocumentController {
 		variable = "";
 		function = "";
 		VariableText.setText("");
+		gc.setStroke(Color.BLACK);
 		p = new ParsedExpressions();
 		pec = new PostfixExperssionCacl(function, variable);
 	}
@@ -132,22 +127,22 @@ public class FXMLDocumentController {
 		alert.getDialogPane().setMinSize(330, 130);
 		if (event.getCode().equals(KeyCode.ENTER)) {
 			try {
-				if (Integer.valueOf(ZoomDisplay.getText()) >= 1 && Integer.valueOf(ZoomDisplay.getText()) <= 100) {
+				if (Integer.valueOf(ZoomDisplay.getText()) >= 10 && Integer.valueOf(ZoomDisplay.getText()) <= 100) {
 					zoom = Integer.valueOf(ZoomDisplay.getText());
 					reset();
 					reDrawFunctions();
 				} else {
 					ZoomDisplay.setText(String.valueOf(zoom));
-					alert.setTitle("Too big zoom");
+					alert.setTitle("Too big zoom or too small");
 					alert.setContentText("Zoom value is out of range.\n"
-							+ "Zoom can only have value between 1 and 100.");
+							+ "Zoom can only have value between 10 and 100.");
 					alert.showAndWait();
 
 				}
 			} catch (NumberFormatException e) {
 				ZoomDisplay.setText(String.valueOf(zoom));
-				alert.setTitle("Not a integer");
-				alert.setContentText("Zoom value can only be integer writen in decimal form");
+				alert.setTitle("Not a natural number");
+				alert.setContentText("Zoom value can only be natural nmber");
 				alert.showAndWait();
 
 			}
@@ -195,15 +190,14 @@ public class FXMLDocumentController {
 					coordinates.AddToMap(i * zoom, d);
 				}
 			}
-			// funguje 
 			ParsedExpressions temp = pec.getParsedExpression();
 			temp.ChangeColorAtIndex1((Color) gc.getStroke());
-			if(p.addNewEntry(temp)){ // diky antiAnalysing zmena barvy je nutne vykreslit nove a ne pres sebe
+			if (p.addNewEntry(temp)) { // diky antiAnalysing zmena barvy je nutne vykreslit nove a ne pres sebe
 				reDrawFunctions();
 				drawScale();
-			}else{
+			} else {
 				drawToCanvas(coordinates);
-			};
+			}
 			System.out.println("-----------------");
 			System.out.println(p.toString());
 			System.out.println("-----------------");
@@ -238,10 +232,13 @@ public class FXMLDocumentController {
 	}
 
 	@FXML
-	public void keyTypedInVariable(KeyEvent event) {
-		if (Variable.getText().length() > 1) {
+	public void keyTypedInVariable(KeyEvent event) { //nefunguje
+		System.out.println(Variable.getText());
+		if (Variable.getText().length() > 0) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);
 			alert.setHeaderText("Variable can be only one character");
+			alert.showAndWait();
+			Variable.setText("");
 		}
 	}
 
@@ -274,7 +271,6 @@ public class FXMLDocumentController {
 	}
 
 	public void drawToCanvas(PointsCoordinates coordinates) {
-		int distanceBetweenPoints;
 		Point2D point1;
 		Point2D point2;
 		for (int i = 0; i < coordinates.getArrayListLenght() - 1; i++) {
@@ -304,8 +300,8 @@ public class FXMLDocumentController {
 				}
 			}
 			drawToCanvas(coordinates);
-			drawScale();
 		}
+		drawScale();
 
 	}
 
@@ -316,8 +312,8 @@ public class FXMLDocumentController {
 		for (double x = -(Canvas.getWidth() / (2 * zoom)); x < (Canvas.getWidth() / (2 * zoom)); x += (0.1 / (double) zoom)) {
 			double distanceFromZero = Math.abs(Math.round(realX) - Canvas.getWidth() / 2);
 			double tempX = Math.abs(Math.round(x * 1000));
-			if (distanceFromZero > 25 && (tempX == 500 || tempX == 1000 || tempX == 2000 || tempX == 5000 || tempX == 10000 || tempX == 30000)) {
-				gc.strokeText(String.valueOf(Math.round(x * 1000) / 1000.), realX, Canvas.getHeight() / 2 + 14);
+			if (distanceFromZero > 25 && (tempX == 500 || tempX == 1000 || tempX == 2000 || tempX == 5000 || tempX == 10000 || tempX == 20000 || tempX == 30000)) {
+				gc.strokeText(String.valueOf(tempX / 1000.), realX, Canvas.getHeight() / 2 + 14);
 				gc.strokeLine(realX, Canvas.getHeight() / 2 + 5, realX, Canvas.getHeight() / 2 - 5);
 			}
 			realX += 0.1;
@@ -326,8 +322,8 @@ public class FXMLDocumentController {
 		for (double y = -(Canvas.getHeight() / (2 * zoom)); y < (Canvas.getHeight() / (2 * zoom)); y += (0.1 / (double) zoom)) {
 			double distanceFromZero = Math.abs(Math.round(realY) - Canvas.getHeight() / 2);
 			double tempY = Math.abs(Math.round(y * 1000));
-			if (distanceFromZero > 25 && (tempY == 500 || tempY == 1000 || tempY == 2000 || tempY == 5000 || tempY == 10000 || tempY == 30000)) {
-				gc.strokeText(String.valueOf(Math.round(y * 1000) / 1000.), Canvas.getWidth() / 2 - 34, realY);
+			if (distanceFromZero > 25 && (tempY == 500 || tempY == 1000 || tempY == 2000 || tempY == 5000 || tempY == 10000 || tempY == 20000 || tempY == 30000)) {
+				gc.strokeText(String.valueOf(tempY / 1000.), Canvas.getWidth() / 2 - 34, realY);
 				gc.strokeLine(Canvas.getWidth() / 2 + 5, realY, Canvas.getWidth() / 2 - 5, realY);
 			}
 			realY += 0.1;

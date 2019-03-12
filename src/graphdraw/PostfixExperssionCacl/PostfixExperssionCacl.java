@@ -3,8 +3,6 @@ package graphdraw.PostfixExperssionCacl;
 import graphdraw.ParsedExpressions;
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.Stack;
 import javafx.scene.control.Alert;
 

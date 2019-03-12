@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 
 /**
  *
- * @author havra
+ * @author havras
  */
 public class GraphDraw extends Application {
     

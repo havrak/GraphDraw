@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import javafx.scene.paint.Color;
 
 /**
- * Funguje podobne jako HashMap - klicovou hodnotu je predpis funkce
+ * 
  *
  * @author havra
  */
 public class ParsedExpressions {
 
-	private ArrayList<Color> colors = new ArrayList<>();
-	private ArrayList<ArrayList<String>> postfixExpressions = new ArrayList<>();
-	private ArrayList<String> variables = new ArrayList<String>();
+	private final ArrayList<Color> colors = new ArrayList<>();
+	private final ArrayList<ArrayList<String>> postfixExpressions = new ArrayList<>();
+	private final ArrayList<String> variables = new ArrayList<String>();
 
 	public Color getColor(int i) {
 		return colors.get(i);
@@ -49,7 +49,7 @@ public class ParsedExpressions {
 	}
 
 	/**
-	 * will be used for addNewEntry - combines values form postfixExpressionCalc
+	 * Used for addNewEntry - combines values form postfixExpressionCalc
 	 * and FXMLDocumentControler
 	 *
 	 * @param color
@@ -73,7 +73,7 @@ public class ParsedExpressions {
 	 * Adds new entry, return true if there was only need to change color
 	 * 
 	 * @param parsed
-	 * @return 
+	 * @return
 	 */
 	public boolean addNewEntry(ParsedExpressions parsed) {
 		boolean wasThereOnlyNeedForChangeOfColor = false;
