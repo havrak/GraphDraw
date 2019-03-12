@@ -17,14 +17,14 @@ public class GraphDraw extends Application {
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("FXMLDocument.fxml"));
         Parent root = loader.load();
-        Scene scene = new Scene(root, 827,900);
+        Scene scene = new Scene(root);
         ((FXMLDocumentController)loader.getController()).setStage(stage);
         stage.setTitle("GraphDrawing");
 		stage.getIcons().add(new Image("icon.png"));
         stage.setScene(scene);
         stage.show();
-		stage.setMinHeight(678);
-		stage.setMinWidth(827);
+		stage.setMinHeight(800);
+		stage.setMinWidth(800);
         stage.setResizable(true);
     }
 

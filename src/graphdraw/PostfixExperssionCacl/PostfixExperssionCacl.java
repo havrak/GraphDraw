@@ -39,6 +39,7 @@ public class PostfixExperssionCacl {
 			postfixFunctionArray.add("0");
 		}
 		for (int i = 0; i < infixFunction.length(); i++) {
+			System.out.println(infixFunction.charAt(i));
 			wasItALetter = false;
 			wasItADigit = false;
 			char c = infixFunction.charAt(i);
@@ -98,7 +99,7 @@ public class PostfixExperssionCacl {
 				case '^':
 					postfixFunctionArray.addAll(stack.addToStack(String.valueOf(c)));
 					break;
-				case '(':
+				case '(': // nefunguje
 					int startingIndex = i + 1;
 					int j = i + 1;
 					boolean stop = false;
@@ -114,7 +115,7 @@ public class PostfixExperssionCacl {
 					}
 					if (stop == false) {
 						String temp = infixFunction.substring(startingIndex, j + 1);
-						i += temp.length() + 2;
+						i += temp.length()+1; // z nejakeho duvodu bylo x +2
 						postfixFunctionArray.add(temp);
 					}
 					break;
