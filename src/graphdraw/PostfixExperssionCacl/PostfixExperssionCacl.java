@@ -3,7 +3,6 @@ package graphdraw.PostfixExperssionCacl;
 import graphdraw.ParsedExpressions;
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Stack;
 import javafx.scene.control.Alert;
 
@@ -237,7 +236,6 @@ public class PostfixExperssionCacl {
 		a.setTitle("Error");
 		a.setHeaderText("Unknown string: " + s);
 		a.showAndWait();
-
 	}
 
 	public void setPostfixExpression(ArrayList<String> postfixFunctionArray, String variable) {

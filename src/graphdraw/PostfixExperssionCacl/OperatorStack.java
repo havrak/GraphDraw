@@ -22,7 +22,7 @@ public class OperatorStack {
 			while ((endOfStack.length() >= 2 || p.getPresedenceForString(s) <= p.getPresedenceForString(endOfStack)
 					&& !endOfStack.equals("^")) && !endOfStack.equals("(") && !stop) { // chyba v podmince
 				toReturn.add(takeFromStack());
-				if (stack.isEmpty()) { // z nejakeho neznameho duvodu musi byt boolean
+				if (stack.isEmpty()) {
 					stop = true;
 				} else {
 					endOfStack = stack.get(stack.size() - 1); // muze hodit chybu
