@@ -23,7 +23,7 @@ public class GraphDraw extends Application {
 		stage.getIcons().add(new Image("icon.png"));
         stage.setScene(scene);
         stage.show();
-		stage.setMinHeight(800);
+		stage.setMinHeight(626);
 		stage.setMinWidth(800);
         stage.setResizable(true);
     }

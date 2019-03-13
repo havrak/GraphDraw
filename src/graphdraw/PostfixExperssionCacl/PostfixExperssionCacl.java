@@ -3,6 +3,7 @@ package graphdraw.PostfixExperssionCacl;
 import graphdraw.ParsedExpressions;
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Stack;
 import javafx.scene.control.Alert;
 
@@ -14,6 +15,7 @@ public class PostfixExperssionCacl {
 
 	String infixFunction;
 	ArrayList<String> postfixFunctionArray = new ArrayList<>();
+	char[] recognitionArray;
 	String variable;
 	boolean isExpressionCalculable = true;
 
@@ -114,7 +116,7 @@ public class PostfixExperssionCacl {
 					}
 					if (stop == false) {
 						String temp = infixFunction.substring(startingIndex, j + 1);
-						i += temp.length()+1; // z nejakeho duvodu bylo x +2
+						i += temp.length() + 1; // z nejakeho duvodu bylo x +2
 						postfixFunctionArray.add(temp);
 					}
 					break;
@@ -130,23 +132,39 @@ public class PostfixExperssionCacl {
 
 		}
 		infixFunction = infixFunction.substring(0, infixFunction.length() - 1);
-		postfixFunctionArray.addAll(stack.emptyWholeStack());
+		postfixFunctionArray.addAll(stack.emptyWholeStack()); // vyhodi zbytek zasobniku do Array
+		recognitionArray = new char[postfixFunctionArray.size()];
+		setUpRecognitionArray();
 		System.out.println("Infix expression is: " + infixFunction + ", Postfix expression is: " + postfixFunctionArray + ", parsing took: " + ((System.nanoTime() - time) / 1000_000) + "ms");
 	}
-
+	// rychlejsi vypocet nedelam s ArrayListem a String u cisel a promenych
+	private void setUpRecognitionArray(){
+		for (int i = 0; i < recognitionArray.length; i++) {
+			if (postfixFunctionArray.get(i).equals("-" + this.variable)) {
+					recognitionArray[i] = 'n';
+				} else if (postfixFunctionArray.get(i).equals(this.variable)) {
+					recognitionArray[i] = 'p';
+				} else if ((postfixFunctionArray.get(i).equals("-") && postfixFunctionArray.get(i).length() >= 2) || (Character.isDigit(postfixFunctionArray.get(i).charAt(0))) || postfixFunctionArray.get(i).charAt(0) == '.') {
+					recognitionArray[i] = 'd';
+				} else {
+					recognitionArray[i] = 'o';
+				}
+		}
+	}
+		
 	public double evaluateExpression(double variable) {
 		if (isExpressionCalculable) {
 			Stack<Double> stack = new Stack<>();
+			double d1;
+			double d2;
 			for (int i = 0; i < postfixFunctionArray.size(); i++) {
-				if (postfixFunctionArray.get(i).equals("-" + this.variable)) {
+				if (recognitionArray[i] == 'n') {
 					stack.push(variable * -1);
-				} else if (postfixFunctionArray.get(i).equals(this.variable)) {
+				} else if (recognitionArray[i]== 'p') {
 					stack.push(variable);
-				} else if ((postfixFunctionArray.get(i).equals("-") && postfixFunctionArray.get(i).length() >= 2) || (Character.isDigit(postfixFunctionArray.get(i).charAt(0))) || postfixFunctionArray.get(i).charAt(0) == '.') {
+				} else if (recognitionArray[i] == 'd') {
 					stack.push(Double.valueOf(postfixFunctionArray.get(i)));
 				} else {
-					double d1;
-					double d2;
 					switch (postfixFunctionArray.get(i)) {
 						case "tan":
 							stack.push(Math.tan(stack.pop()));
@@ -223,11 +241,13 @@ public class PostfixExperssionCacl {
 	}
 
 	public void setPostfixExpression(ArrayList<String> postfixFunctionArray, String variable) {
-		this.variable =variable;
+		this.variable = variable;
 		this.postfixFunctionArray = postfixFunctionArray;
 		isExpressionCalculable = true;
+		recognitionArray = new char[this.postfixFunctionArray.size()];
+		setUpRecognitionArray();
 	}
-	
+
 	public ParsedExpressions getParsedExpression() {
 		return new ParsedExpressions(Color.BLACK, postfixFunctionArray, variable);
 	}
