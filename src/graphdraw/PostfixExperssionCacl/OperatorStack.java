@@ -12,6 +12,7 @@ public class OperatorStack {
 	private final ArrayList<String> stack = new ArrayList<>();
 
 	public ArrayList<String> addToStack(String s) {
+		System.out.println("before Add: "+stack);
 		ArrayList<String> toReturn = new ArrayList<>();
 		if (stack.isEmpty()) {
 			stack.add(s);
@@ -30,6 +31,7 @@ public class OperatorStack {
 			}
 			stack.add(s);
 		}
+		System.out.println("after Add: "+stack);
 		return toReturn;
 	}
 	public void basicAdd(String s){
@@ -37,9 +39,10 @@ public class OperatorStack {
 	}
 
 	public ArrayList<String> rightBracket() {
+		System.out.println("Operator stack is: "+stack);
 		ArrayList<String> toReturn = new ArrayList<>();
 		String endOfStack = stack.get(stack.size() - 1);
-		while (!endOfStack.equals("(")) {
+		while (!endOfStack.equals("(") && !stack.isEmpty()) {
 			toReturn.add(takeFromStack());
 			if (!stack.isEmpty()) {
 				endOfStack = stack.get(stack.size() - 1);
@@ -49,6 +52,8 @@ public class OperatorStack {
 			Alert a = new Alert(Alert.AlertType.ERROR);
 			a.setTitle("Error");
 			a.setHeaderText("Mismatched parenthesies");
+			a.showAndWait();
+			return null;
 		} else {
 			takeFromStack();
 		}
