@@ -1,12 +1,10 @@
 package graphdraw;
 
 import com.sun.javafx.scene.control.skin.CustomColorDialog;
-import graphdraw.PostfixExperssionCacl.PostfixExperssionCacl;
+import graphdraw.PostfixExperssionCacl.PostfixExpressionCacl;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -83,7 +81,7 @@ public class FXMLDocumentController {
 	@FXML
 	private TextField Variable;
 
-	private PostfixExperssionCacl pec;
+	private PostfixExpressionCacl pec;
 	private ParsedExpressions p = new ParsedExpressions();
 
 	private CustomColorDialog colorDialog;
@@ -110,7 +108,7 @@ public class FXMLDocumentController {
 	}
 
 	@FXML
-	private void btnHelpPressed(ActionEvent event) {
+	private void btnHelpPressed(ActionEvent event) { // remake
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle("Informace o použití");
 		alert.setHeaderText("Informace o požití");
@@ -125,6 +123,7 @@ public class FXMLDocumentController {
 				+ "- pro ln zadejte: ln(VÝRAZ)\n"
 				+ "- pro konstantu pi zadejte: pi\n"
 				+ "- pro konstantu e zadejte: e\n"
+				+ "- pro konstantu phi zadejte: phi\n"
 				+ "- pro mocninu zadejte: ZAKLAD^EXPONENT\n"
 				+ "- pro odmocninu zadejte: ZAKLAD^(1/ODMOCNITEL)\n");
 		alert.getDialogPane().setMinSize(640, 400);
@@ -141,7 +140,7 @@ public class FXMLDocumentController {
 		VariableText.setText("");
 		gc.setStroke(Color.BLACK);
 		p = new ParsedExpressions();
-		pec = new PostfixExperssionCacl(function, variable);
+		pec = new PostfixExpressionCacl(function, variable);
 		drawScale();
 	}
 
@@ -227,7 +226,7 @@ public class FXMLDocumentController {
 			function = TextField.getText().toLowerCase().trim();
 			variable = Variable.getText();
 
-			pec = new PostfixExperssionCacl(function, variable);
+			pec = new PostfixExpressionCacl(function, variable);
 			for (double i = -(Canvas.getWidth() / (2 * zoom)); i < (Canvas.getWidth() / (2 * zoom)); i += (0.1 / (double) zoom)) {
 				Double d = pec.evaluateExpression(i) * zoom;
 				if (d.isNaN()) {
@@ -237,15 +236,17 @@ public class FXMLDocumentController {
 				}
 			}
 			ParsedExpressions temp = pec.getParsedExpression();
-			temp.ChangeColorAtIndex1((Color) gc.getStroke());
-			if (p.addNewEntry(temp)) { // diky antiAnalysing zmena barvy je nutne vykreslit nove a ne pres sebe
-				reDrawFunctions(true);
-				drawScale();
-			} else {
-				drawToCanvas(coordinates, true);
+			if (temp != null) {
+				temp.ChangeColorAtIndex1((Color) gc.getStroke());
+				if (p.addNewEntry(temp)) { // diky antiAnalysing zmena barvy je nutne vykreslit nove a ne pres sebe
+					reDrawFunctions(true);
+					drawScale();
+				} else {
+					drawToCanvas(coordinates, true);
+				}
 			}
 			System.out.println(p.toString());
-			System.out.println("Time: " + (System.nanoTime() - time) / 1000_000 + "ms");
+			System.out.println("Time:\t" + (System.nanoTime() - time) / 1000_000 + "ms");
 			System.out.println("-----------------");
 		}
 	}
@@ -385,7 +386,7 @@ public class FXMLDocumentController {
 	}
 
 	public void reset(boolean b) {
-		if (gc != null) { // zavola se driv nez se prida gc
+		if (gc != null) {// zavola se driv nez se prida gc
 			gc.setFill(Color.WHITE);
 			Color stroke = (Color) gc.getStroke();
 			gc.setStroke(Color.BLACK);

@@ -3,6 +3,7 @@ package graphdraw.PostfixExperssionCacl;
 import graphdraw.ParsedExpressions;
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 import javafx.scene.control.Alert;
 
@@ -10,7 +11,7 @@ import javafx.scene.control.Alert;
  *
  * @author havra
  */
-public class PostfixExperssionCacl {
+public class PostfixExpressionCacl {
 
 	String infixFunction;
 	ArrayList<String> postfixFunctionArray = new ArrayList<>();
@@ -18,7 +19,7 @@ public class PostfixExperssionCacl {
 	String variable;
 	boolean isExpressionCalculable = true;
 
-	public PostfixExperssionCacl(String infixFunction, String variable) {
+	public PostfixExpressionCacl(String infixFunction, String variable) {
 		this.infixFunction = infixFunction + " "; // diky zpusobu jakym je algoritmus zapsany nebral posledni string -> nejlehci zpusob jak to vyresit
 		this.variable = variable;
 		parse();
@@ -35,7 +36,6 @@ public class PostfixExperssionCacl {
 		boolean wasItADigit;
 		int startingIndexOfDigit = 0;
 		int startingIndexOfLetter = 0;
-		boolean numberInBrackets = false;
 		if (infixFunction.charAt(0) == '-') {
 			postfixFunctionArray.add("0");
 		}
@@ -49,7 +49,6 @@ public class PostfixExperssionCacl {
 					firstLetter = false;
 				}
 				wasItALetter = true;
-
 			} else if (Character.isDigit(infixFunction.charAt(i)) || c == '.') {
 				if (firstDigit) {
 					startingIndexOfDigit = i;
@@ -85,6 +84,13 @@ public class PostfixExperssionCacl {
 							errorMessage(temp);
 						}
 						break;
+					case 3:
+						if (temp.equals("phi")) {
+							postfixFunctionArray.add("1.618033988749895");
+						} else {
+							stack.basicAdd(temp);
+						}
+						break;
 					default:
 						stack.basicAdd(temp);
 				}
@@ -109,7 +115,7 @@ public class PostfixExperssionCacl {
 					while (infixFunction.charAt(j + 1) != ')' && !stop) { // out of bounds
 						if (!(Character.isDigit(infixFunction.charAt(j)) || infixFunction.charAt(j) == '.') || infixFunction.charAt(i) == variable.charAt(0)) {
 							stop = true;
-							stack.leftBracket();
+							stack.basicAdd("(");
 						}
 						j++;
 					}
@@ -120,10 +126,17 @@ public class PostfixExperssionCacl {
 					}
 					break;
 				case ')':
-					if (!numberInBrackets) {
-						postfixFunctionArray.addAll(stack.rightBracket());
+					System.out.println(postfixFunctionArray + "   " + i);
+					List<String> toAdd = stack.rightBracket();
+					if (toAdd == null) {
+						isExpressionCalculable = false;
+					} else {
+						postfixFunctionArray.addAll(toAdd);
 					}
-					numberInBrackets = false;
+					break;
+				case ',':
+					System.out.println("comma");
+					postfixFunctionArray.addAll(stack.commaFound());
 					break;
 				default:
 					break;
@@ -136,85 +149,100 @@ public class PostfixExperssionCacl {
 		setUpRecognitionArray();
 		System.out.println("Infix expression is: " + infixFunction + ", Postfix expression is: " + postfixFunctionArray + ", parsing took: " + ((System.nanoTime() - time) / 1000_000) + "ms");
 	}
+
 	// rychlejsi vypocet nedelam s ArrayListem a String u cisel a promenych
-	private void setUpRecognitionArray(){
+	private void setUpRecognitionArray() {
 		for (int i = 0; i < recognitionArray.length; i++) {
 			if (postfixFunctionArray.get(i).equals("-" + this.variable)) {
-					recognitionArray[i] = 'n';
-				} else if (postfixFunctionArray.get(i).equals(this.variable)) {
-					recognitionArray[i] = 'p';
-				} else if ((postfixFunctionArray.get(i).equals("-") && postfixFunctionArray.get(i).length() >= 2) || (Character.isDigit(postfixFunctionArray.get(i).charAt(0))) || postfixFunctionArray.get(i).charAt(0) == '.') {
-					recognitionArray[i] = 'd';
-				} else {
-					recognitionArray[i] = 'o';
-				}
+				recognitionArray[i] = 'n';
+			} else if (postfixFunctionArray.get(i).equals(this.variable)) {
+				recognitionArray[i] = 'p';
+			} else if ((postfixFunctionArray.get(i).equals("-") && postfixFunctionArray.get(i).length() >= 2) || (Character.isDigit(postfixFunctionArray.get(i).charAt(0))) || postfixFunctionArray.get(i).charAt(0) == '.') {
+				recognitionArray[i] = 'd';
+			} else {
+				recognitionArray[i] = 'o';
+			}
 		}
 	}
-		
+
 	public double evaluateExpression(double variable) {
 		if (isExpressionCalculable) {
 			Stack<Double> stack = new Stack<>();
 			double d1;
 			double d2;
 			for (int i = 0; i < postfixFunctionArray.size(); i++) {
-				if (recognitionArray[i] == 'n') {
-					stack.push(variable * -1);
-				} else if (recognitionArray[i]== 'p') {
-					stack.push(variable);
-				} else if (recognitionArray[i] == 'd') {
-					stack.push(Double.valueOf(postfixFunctionArray.get(i)));
-				} else {
-					switch (postfixFunctionArray.get(i)) {
-						case "tan":
-							stack.push(Math.tan(stack.pop()));
-							break;
-						case "atan":
-							stack.push(Math.atan(stack.pop()));
-							break;
-						case "sin":
-							stack.push(Math.sin(stack.pop()));
-							break;
-						case "asin":
-							stack.push(Math.asin(stack.pop()));
-							break;
-						case "cos":
-							stack.push(Math.cos(stack.pop()));
-							break;
-						case "acos":
-							stack.push(Math.acos(stack.pop()));
-							break;
-						case "abs":
-							stack.push(Math.abs(stack.pop()));
-							break;
-						case "^":
-							d1 = stack.pop();
-							d2 = stack.pop();
-							stack.push(Math.pow(d2, d1));
-							break;
-						case "/":
-							d1 = stack.pop();
-							d2 = stack.pop();
-							stack.push(d2 / d1);
-							break;
-						case "*":
-							stack.push(stack.pop() * stack.pop());
-							break;
-						case "+":
-							stack.push(stack.pop() + stack.pop());
-							break;
-						case "-":
-							d1 = stack.pop();
-							d2 = stack.pop();
-							stack.push(d2 - d1);
-							break;
-						case "max":
-							stack.push(Math.max(stack.pop(), stack.pop()));
-							break;
-						default:
-							isExpressionCalculable = false;
-							errorMessage(postfixFunctionArray.get(i));
-							return Double.NaN;
-					}
+				switch (recognitionArray[i]) {
+					case 'n':
+						stack.push(variable * -1);
+						break;
+					case 'p':
+						stack.push(variable);
+						break;
+					case 'd':
+						stack.push(Double.valueOf(postfixFunctionArray.get(i)));
+						break;
+					default:
+						switch (postfixFunctionArray.get(i)) {
+							case "tan":
+								stack.push(Math.tan(stack.pop()));
+								break;
+							case "atan":
+								stack.push(Math.atan(stack.pop()));
+								break;
+							case "sin":
+								stack.push(Math.sin(stack.pop()));
+								break;
+							case "asin":
+								stack.push(Math.asin(stack.pop()));
+								break;
+							case "cos":
+								stack.push(Math.cos(stack.pop()));
+								break;
+							case "acos":
+								stack.push(Math.acos(stack.pop()));
+								break;
+							case "abs":
+								stack.push(Math.abs(stack.pop()));
+								break;
+							case "^":
+								d1 = stack.pop();
+								d2 = stack.pop();
+								stack.push(Math.pow(d2, d1));
+								break;
+							case "/":
+								d1 = stack.pop();
+								d2 = stack.pop();
+								stack.push(d2 / d1);
+								break;
+							case "*":
+								stack.push(stack.pop() * stack.pop());
+								break;
+							case "+":
+								stack.push(stack.pop() + stack.pop());
+								break;
+							case "-":
+								d1 = stack.pop();
+								d2 = stack.pop();
+								stack.push(d2 - d1);
+								break;
+							case "max":
+								stack.push(Math.max(stack.pop(), stack.pop()));
+								break;
+							case "exp":
+								stack.push(Math.exp(stack.pop()));
+								break;
+							case "ceil":
+								stack.push(Math.ceil(stack.pop()));
+								break;
+							case "floor":
+								stack.push(Math.floor(stack.pop()));
+								break;
+							default:
+								isExpressionCalculable = false;
+								errorMessage(postfixFunctionArray.get(i));
+								return Double.NaN;
+						}
+						break;
 				}
 			}
 			if (!stack.isEmpty()) {
@@ -247,6 +275,13 @@ public class PostfixExperssionCacl {
 	}
 
 	public ParsedExpressions getParsedExpression() {
-		return new ParsedExpressions(Color.BLACK, postfixFunctionArray, variable);
+		if (isExpressionCalculable) {
+			return new ParsedExpressions(Color.BLACK, postfixFunctionArray, variable);
+		}
+		return null;
+	}
+
+	public static void main(String[] args) { // x 3 + sin
+		PostfixExpressionCacl p = new PostfixExpressionCacl("sin(x+3) ", "x");
 	}
 }

@@ -90,6 +90,6 @@ public class ParsedExpressions {
 	}
 
 	public String toString() {
-		return "colors: " + colors + "\n" + "f(x): " + postfixExpressions + "\n" + "variables: " + variables;
+		return "colors:\t\t" + colors + "\n" + "functions:\t" + postfixExpressions + "\n" + "variables:\t" + variables;
 	}
 }

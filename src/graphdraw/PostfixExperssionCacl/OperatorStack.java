@@ -1,6 +1,7 @@
 package graphdraw.PostfixExperssionCacl;
 
 import java.util.ArrayList;
+import java.util.List;
 import javafx.scene.control.Alert;
 
 /**
@@ -12,7 +13,6 @@ public class OperatorStack {
 	private final ArrayList<String> stack = new ArrayList<>();
 
 	public ArrayList<String> addToStack(String s) {
-		System.out.println("before Add: "+stack);
 		ArrayList<String> toReturn = new ArrayList<>();
 		if (stack.isEmpty()) {
 			stack.add(s);
@@ -21,25 +21,24 @@ public class OperatorStack {
 			String endOfStack = stack.get(stack.size() - 1);
 			boolean stop = false;
 			while ((endOfStack.length() >= 2 || p.getPresedenceForString(s) <= p.getPresedenceForString(endOfStack)
-					&& !endOfStack.equals("^")) && !endOfStack.equals("(") && !stop) { // chyba v podmince
+					&& !endOfStack.equals("^")) && !endOfStack.equals("(") && !stop) {
 				toReturn.add(takeFromStack());
 				if (stack.isEmpty()) {
 					stop = true;
 				} else {
-					endOfStack = stack.get(stack.size() - 1); // muze hodit chybu
+					endOfStack = stack.get(stack.size() - 1);
 				}
 			}
 			stack.add(s);
 		}
-		System.out.println("after Add: "+stack);
 		return toReturn;
 	}
-	public void basicAdd(String s){
+
+	public void basicAdd(String s) {
 		stack.add(s);
 	}
 
 	public ArrayList<String> rightBracket() {
-		System.out.println("Operator stack is: "+stack);
 		ArrayList<String> toReturn = new ArrayList<>();
 		String endOfStack = stack.get(stack.size() - 1);
 		while (!endOfStack.equals("(") && !stack.isEmpty()) {
@@ -60,10 +59,6 @@ public class OperatorStack {
 		return toReturn;
 	}
 
-	public void leftBracket() {
-		stack.add("(");
-	}
-
 	public String takeFromStack() {
 		if (!stack.isEmpty()) {
 			String tmp = stack.get(stack.size() - 1);
@@ -73,6 +68,18 @@ public class OperatorStack {
 		return null;
 	}
 
+	public List<String> commaFound() {
+		List<String> toReturn = new ArrayList<>();
+		if (!stack.isEmpty()) {
+			String endOfStack = stack.get(stack.size() - 1);
+			while (!stack.isEmpty() && !endOfStack.equals("(")) {
+				toReturn.add(takeFromStack());
+				endOfStack = stack.get(stack.size()-1);
+			}
+		}
+		return toReturn;
+	}
+
 	public ArrayList<String> emptyWholeStack() {
 		ArrayList<String> toReturn = new ArrayList<>();
 		while (!stack.isEmpty()) {
@@ -80,7 +87,8 @@ public class OperatorStack {
 		}
 		return toReturn;
 	}
-	public String getStack(){
+
+	public String getStack() {
 		return stack.toString();
 	}
 
