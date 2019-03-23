@@ -114,19 +114,13 @@ public class FXMLDocumentController {
 		alert.setHeaderText("Informace o požití");
 		alert.setContentText("Zadejte proměnou do políčka v levém horném rohu a funkci do vedlejšího políčka, pro zobrazení grafu stiskněte ENTER\n"
 				+ "- proměná může být jakékoliv písmeno až na písmeno e, neboť to náleží kontantě e (e \u2250 2,71)\n"
-				+ "- pro sin zadejte: sin(VÝRAZ)\n"
-				+ "- pro asin zadejte: asin(VÝRAZ)\n"
-				+ "- pro cos zadejte: cos(VÝRAZ)\n"
-				+ "- pro acos zadejte: acos(VÝRAZ)\n"
-				+ "- pro tan zadejte: tan(VÝRAZ)\n"
-				+ "- pro atan zadejte: atan(VÝRAZ)\n"
-				+ "- pro ln zadejte: ln(VÝRAZ)\n"
-				+ "- pro konstantu pi zadejte: pi\n"
-				+ "- pro konstantu e zadejte: e\n"
-				+ "- pro konstantu phi zadejte: phi\n"
-				+ "- pro mocninu zadejte: ZAKLAD^EXPONENT\n"
-				+ "- pro odmocninu zadejte: ZAKLAD^(1/ODMOCNITEL)\n");
-		alert.getDialogPane().setMinSize(640, 400);
+				+ "- podporované konstsnty jsou e, \u03C0, \uD835\uDF19 \n"
+				+ "- pro zadání funkce zadejte FUNKCE(VÝRAZ)\n"
+				+ "- podporavené funkce jsou: sin, tan, cos, asin, atan, acos, abs, ln, exp, floor, ceil, log (base 10)"
+				+ "- min a max jsou také podoporované, ty berou dva argumenty oddělené čárkou\n"
+				+ "- pro mocninu zadejte: ZÁKLAD^EXPONENT\n"
+				+ "- pro odmocninu zadejte: ZÁKLAD^(1/ODMOCNITEL)");
+		alert.getDialogPane().setMinSize(300, 300);
 		alert.showAndWait();
 	}
 

@@ -105,14 +105,14 @@ public class PostfixExpressionCacl {
 				case '^':
 					postfixFunctionArray.addAll(stack.addToStack(String.valueOf(c)));
 					break;
-				case '(': // nefunguje
+				case '(':
 					int startingIndex = i + 1;
 					int j = i + 1;
 					boolean stop = false;
 					if (infixFunction.charAt(startingIndex) == '-') {
 						j++;
 					}
-					while (infixFunction.charAt(j + 1) != ')' && !stop) { // out of bounds
+					while (j != infixFunction.length() - 1 && infixFunction.charAt(j + 1) != ')' && !stop) {
 						if (!(Character.isDigit(infixFunction.charAt(j)) || infixFunction.charAt(j) == '.') || infixFunction.charAt(i) == variable.charAt(0)) {
 							stop = true;
 							stack.basicAdd("(");
@@ -135,7 +135,6 @@ public class PostfixExpressionCacl {
 					}
 					break;
 				case ',':
-					System.out.println("comma");
 					postfixFunctionArray.addAll(stack.commaFound());
 					break;
 				default:
@@ -144,7 +143,12 @@ public class PostfixExpressionCacl {
 
 		}
 		infixFunction = infixFunction.substring(0, infixFunction.length() - 1);
-		postfixFunctionArray.addAll(stack.emptyWholeStack()); // vyhodi zbytek zasobniku do Array
+		List<String> toAdd = stack.emptyWholeStack();
+		if (toAdd == null) {
+			isExpressionCalculable = false;
+		} else {
+			postfixFunctionArray.addAll(toAdd);
+		}
 		recognitionArray = new char[postfixFunctionArray.size()];
 		setUpRecognitionArray();
 		System.out.println("Infix expression is: " + infixFunction + ", Postfix expression is: " + postfixFunctionArray + ", parsing took: " + ((System.nanoTime() - time) / 1000_000) + "ms");
@@ -228,9 +232,16 @@ public class PostfixExpressionCacl {
 							case "max":
 								stack.push(Math.max(stack.pop(), stack.pop()));
 								break;
+							case "min":
+								stack.push(Math.min(stack.pop(), stack.pop()));
+								break;
 							case "exp":
 								stack.push(Math.exp(stack.pop()));
 								break;
+							case "log":
+								stack.push(Math.log10(stack.pop()));
+								break;
+
 							case "ceil":
 								stack.push(Math.ceil(stack.pop()));
 								break;

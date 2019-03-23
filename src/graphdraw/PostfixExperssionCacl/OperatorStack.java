@@ -48,10 +48,7 @@ public class OperatorStack {
 			}
 		}
 		if (stack.isEmpty()) {
-			Alert a = new Alert(Alert.AlertType.ERROR);
-			a.setTitle("Error");
-			a.setHeaderText("Mismatched parenthesies");
-			a.showAndWait();
+			errorMismatchedParenthesis();
 			return null;
 		} else {
 			takeFromStack();
@@ -74,18 +71,29 @@ public class OperatorStack {
 			String endOfStack = stack.get(stack.size() - 1);
 			while (!stack.isEmpty() && !endOfStack.equals("(")) {
 				toReturn.add(takeFromStack());
-				endOfStack = stack.get(stack.size()-1);
+				endOfStack = stack.get(stack.size() - 1);
 			}
 		}
 		return toReturn;
 	}
 
 	public ArrayList<String> emptyWholeStack() {
+		if (stack.contains("(")) {
+			errorMismatchedParenthesis();
+			return null;
+		}
 		ArrayList<String> toReturn = new ArrayList<>();
 		while (!stack.isEmpty()) {
 			toReturn.add(takeFromStack());
 		}
 		return toReturn;
+	}
+
+	private void errorMismatchedParenthesis() {
+		Alert a = new Alert(Alert.AlertType.ERROR);
+		a.setTitle("Error");
+		a.setHeaderText("Mismatched parenthesies");
+		a.showAndWait();
 	}
 
 	public String getStack() {
