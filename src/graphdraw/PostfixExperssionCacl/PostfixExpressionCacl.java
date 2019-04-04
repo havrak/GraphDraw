@@ -151,7 +151,7 @@ public class PostfixExpressionCacl {
 		}
 		recognitionArray = new char[postfixFunctionArray.size()];
 		setUpRecognitionArray();
-		System.out.println("Infix expression is: " + infixFunction + ", Postfix expression is: " + postfixFunctionArray + ", parsing took: " + ((System.nanoTime() - time) / 1000_000) + "ms");
+		System.out.println("Parsing took:\t\t" + ((System.nanoTime() - time) / 1000_000) + "ms");
 	}
 
 	// rychlejsi vypocet nedelam s ArrayListem a String u cisel a promenych
@@ -241,7 +241,6 @@ public class PostfixExpressionCacl {
 							case "log":
 								stack.push(Math.log10(stack.pop()));
 								break;
-
 							case "ceil":
 								stack.push(Math.ceil(stack.pop()));
 								break;
@@ -285,14 +284,10 @@ public class PostfixExpressionCacl {
 		setUpRecognitionArray();
 	}
 
-	public ParsedExpressions getParsedExpression() {
+	public ArrayList<String> getParsedExpression() {
 		if (isExpressionCalculable) {
-			return new ParsedExpressions(Color.BLACK, postfixFunctionArray, variable);
+			return postfixFunctionArray;
 		}
 		return null;
-	}
-
-	public static void main(String[] args) { // x 3 + sin
-		PostfixExpressionCacl p = new PostfixExpressionCacl("sin(x+3) ", "x");
 	}
 }

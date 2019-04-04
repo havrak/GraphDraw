@@ -1,6 +1,7 @@
 package graphdraw;
 
 import java.util.ArrayList;
+import java.util.List;
 import javafx.scene.paint.Color;
 
 /**
@@ -10,16 +11,13 @@ import javafx.scene.paint.Color;
  */
 public class ParsedExpressions {
 
-	private final ArrayList<Color> colors = new ArrayList<>();
-	private final ArrayList<ArrayList<String>> postfixExpressions = new ArrayList<>();
-	private final ArrayList<String> variables = new ArrayList<String>();
-
+	private final List<Color> colors = new ArrayList<>();
+	private final List<ArrayList<String>> postfixExpressions = new ArrayList<>();
+	private final List<String> variables = new ArrayList<String>();
+	private final List<String> intfixExpressions = new ArrayList<>();
+	
 	public Color getColor(int i) {
 		return colors.get(i);
-	}
-
-	public ParsedExpressions getParsedExpressions() {
-		return this;
 	}
 
 	public ArrayList<String> getPostfixExpression(int i) {
@@ -33,19 +31,8 @@ public class ParsedExpressions {
 	public int getSize() {
 		return colors.size();
 	}
-
-	private void setColorForExisting(int i, Color newColor) {
-		colors.set(i, newColor);
-	}
-
-	/**
-	 * Used by FXMLDocumentControler to change color of PostfixExpressionCalc
-	 * output
-	 *
-	 * @param paint
-	 */
-	public void ChangeColorAtIndex1(Color paint) {
-		colors.set(0, paint);
+	public int getIndexOfInfixFunction(String infix){
+		return intfixExpressions.indexOf(infix);
 	}
 
 	/**
@@ -67,29 +54,29 @@ public class ParsedExpressions {
 
 	public ParsedExpressions() {
 	}
-
 	
 	/**
 	 * Adds new entry, return true if there was only need to change color
 	 * 
 	 * @param parsed
 	 * @return
-	 */
-	public boolean addNewEntry(ParsedExpressions parsed) {
-		boolean wasThereOnlyNeedForChangeOfColor = false;
+	 */	
+		public boolean addNewEntry(ArrayList<String> postfixExpression, String infixExpression, String variable, Color color) {
 		for (int i = 0; i < getSize(); i++) {
-			if (getPostfixExpression(i).equals(parsed.getPostfixExpression(0))) {
-				setColorForExisting(i, parsed.getColor(0));
+			if (getPostfixExpression(i).equals(postfixExpression)) {
+				colors.set(i, color);
 				return true;
 			}
 		}
-		colors.add(parsed.getColor(0));
-		postfixExpressions.add(parsed.getPostfixExpression(0));
-		variables.add(parsed.getVariable(0));
+		colors.add(color);
+		postfixExpressions.add(postfixExpression);
+		variables.add(variable);
+		intfixExpressions.add(infixExpression);
 		return false;
 	}
-
+	
+	@Override
 	public String toString() {
-		return "colors:\t\t" + colors + "\n" + "functions:\t" + postfixExpressions + "\n" + "variables:\t" + variables;
+		return "colors:\t\t\t" + colors + "\n" + "functions (Postfix):\t" + postfixExpressions +"\n" + "functions (Infix):\t" + intfixExpressions + "\n" + "variables:\t\t" + variables;
 	}
 }

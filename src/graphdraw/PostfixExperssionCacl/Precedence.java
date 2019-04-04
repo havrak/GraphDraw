@@ -6,7 +6,7 @@ package graphdraw.PostfixExperssionCacl;
  */
 public enum Precedence {
 	PLUS(1), MINUS(1), MULTIPLY(2), DIVIDE(2), POWER(3);
-	private int presedence;
+	private final int presedence;
 
 	private Precedence(int presedence) {
 		this.presedence = presedence;

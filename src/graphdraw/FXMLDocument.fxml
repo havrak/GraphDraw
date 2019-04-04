@@ -6,6 +6,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="graphdraw.FXMLDocumentController">
@@ -27,7 +28,7 @@
                   <Font size="19.0" />
                </font>
             </Label>
-            <TextField fx:id="TextField" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#drawGraphAction" prefHeight="26.0" prefWidth="396.0" promptText="Enter function here!" />
+            <TextField fx:id="TextField" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#drawGraphAction" prefHeight="26.0" prefWidth="374.0" promptText="Enter function here!" />
             <Button mnemonicParsing="false" onAction="#btnResetPressed" prefHeight="26.0" prefWidth="60.0" text="Reset" />
             <Button mnemonicParsing="false" onAction="#btnColorAction" prefHeight="26.0" prefWidth="60.0" text="Color" />
             <Button mnemonicParsing="false" onAction="#btnPlusPressed" prefHeight="26.0" prefWidth="30.0" text="+" />
@@ -39,13 +40,16 @@
       </HBox>
    </top>
    <bottom>
-      <HBox maxHeight="-Infinity" maxWidth="-Infinity" BorderPane.alignment="CENTER">
+      <HBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="26.0" prefWidth="803.0">
          <children>
-            <TextField fx:id="VariableText" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#specValueAction" prefHeight="26.0" prefWidth="800.0" promptText="Calculate for specific value" />
+            <TextField fx:id="VariableText" alignment="BOTTOM_LEFT" onKeyPressed="#specValueAction" prefHeight="26.0" prefWidth="809.0" promptText="Calculate for specific value" />
          </children>
       </HBox>
    </bottom>
    <center>
-      <Pane fx:id="pane" minHeight="1.0" minWidth="1.0" prefHeight="1.0" prefWidth="1.0" BorderPane.alignment="CENTER" />
+      <Pane fx:id="pane" minHeight="1.0" minWidth="1.0" prefHeight="548.0" prefWidth="800.0" BorderPane.alignment="CENTER" />
    </center>
+   <left>
+      <VBox fx:id="functionChoserBar" prefHeight="548.0" prefWidth="150.0" BorderPane.alignment="CENTER" />
+   </left>
 </BorderPane>
