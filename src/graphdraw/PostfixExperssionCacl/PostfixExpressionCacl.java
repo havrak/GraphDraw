@@ -126,7 +126,6 @@ public class PostfixExpressionCacl {
 					}
 					break;
 				case ')':
-					System.out.println(postfixFunctionArray + "   " + i);
 					List<String> toAdd = stack.rightBracket();
 					if (toAdd == null) {
 						isExpressionCalculable = false;
@@ -142,21 +141,21 @@ public class PostfixExpressionCacl {
 			}
 
 		}
-		infixFunction = infixFunction.substring(0, infixFunction.length() - 1);
 		List<String> toAdd = stack.emptyWholeStack();
 		if (toAdd == null) {
 			isExpressionCalculable = false;
 		} else {
 			postfixFunctionArray.addAll(toAdd);
 		}
-		recognitionArray = new char[postfixFunctionArray.size()];
 		setUpRecognitionArray();
 		System.out.println("Parsing took:\t\t" + ((System.nanoTime() - time) / 1000_000) + "ms");
 	}
 
 	// rychlejsi vypocet nedelam s ArrayListem a String u cisel a promenych
+	// lze predelat na double - vice trochu rychlejsi
 	private void setUpRecognitionArray() {
-		for (int i = 0; i < recognitionArray.length; i++) {
+		recognitionArray = new char[postfixFunctionArray.size()];
+		for (int i = 0; i < postfixFunctionArray.size(); i++) {
 			if (postfixFunctionArray.get(i).equals("-" + this.variable)) {
 				recognitionArray[i] = 'n';
 			} else if (postfixFunctionArray.get(i).equals(this.variable)) {
@@ -269,6 +268,60 @@ public class PostfixExpressionCacl {
 		}
 	}
 
+	// dostane rozmery obrazovky (x) a zoom
+	// najde pruniky s x 
+	public List<Double> bisectionMethod(ArrayList<String> equation2, String variable, double xWidth, double zoom) {
+		if (!this.variable.equals(variable)) {
+			for (int i = 0; i < equation2.size(); i++) {
+				if (equation2.get(i).equals(variable)) {
+					equation2.set(i, this.variable);
+				}
+			}
+		}
+		ArrayList<String> originalPostfixExpression = (ArrayList<String>) postfixFunctionArray.clone();
+		postfixFunctionArray.addAll(equation2);
+		postfixFunctionArray.add("-");
+		setUpRecognitionArray();
+		double prev = evaluateExpression(-xWidth / 2);
+		List<Double> asis = new ArrayList<>();
+		List<Double> bsis = new ArrayList<>();
+		for (double i = -(xWidth / 2); i < (xWidth / 2); i += (0.1 / (double) zoom)) { // nenapadl me lepsi zpusob, najde priblizne body zmeny, uzivatel si hold trochu pocka, co kdyz lezi na ose???
+			double now = evaluateExpression(i);
+			if ((prev < 0 && now > 0) || (prev > 0 && now < 0)) {
+				asis.add(i - (0.1 / (double) zoom));
+				bsis.add(i);
+			}
+			prev = now;
+		}
+		if(asis.isEmpty()){ // Alert
+			return null;
+		}
+		// for ArrayListSize
+		List<Double> toRetun = new ArrayList<>();
+		for (int i = 0; i < asis.size(); i++) {
+			double start = asis.get(i);
+			double end = bsis.get(i);
+			if (start < end && ((evaluateExpression(start) < 0 && evaluateExpression(end) > 0) || (evaluateExpression(start) > 0 && evaluateExpression(end) < 0))) {
+				for (int j = 0; j < 100; j++) {
+					double middle = (start + end) / 2;
+					double valueForMiddle = evaluateExpression(middle);
+					if (valueForMiddle == 0 || Math.abs(middle) < 0.000_000_0001) {
+						toRetun.add(middle);
+					} else if (valueForMiddle < 0) {
+						end = middle;
+					} else {
+						start = middle;
+					}
+				}
+			} else {
+				return null;
+			}
+		}
+		System.out.println("sa");
+		postfixFunctionArray = originalPostfixExpression;
+		return null;
+	}
+
 	public void errorMessage(String s) {
 		Alert a = new Alert(Alert.AlertType.ERROR);
 		a.setTitle("Error");
@@ -280,7 +333,6 @@ public class PostfixExpressionCacl {
 		this.variable = variable;
 		this.postfixFunctionArray = postfixFunctionArray;
 		isExpressionCalculable = true;
-		recognitionArray = new char[this.postfixFunctionArray.size()];
 		setUpRecognitionArray();
 	}
 
@@ -289,5 +341,11 @@ public class PostfixExpressionCacl {
 			return postfixFunctionArray;
 		}
 		return null;
+	}
+
+	public static void main(String[] args) {
+		PostfixExpressionCacl p = new PostfixExpressionCacl("sin(x)*4-2", "x");
+		PostfixExpressionCacl c = new PostfixExpressionCacl("x+5", "x");
+		System.out.println(p.bisectionMethod(c.postfixFunctionArray, "x", 60, 10));
 	}
 }
