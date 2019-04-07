@@ -1,5 +1,6 @@
 package graphdraw.PostfixExperssionCacl;
 
+import com.sun.javafx.css.CalculatedValue;
 import graphdraw.ParsedExpressions;
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
@@ -282,18 +283,19 @@ public class PostfixExpressionCacl {
 		postfixFunctionArray.addAll(equation2);
 		postfixFunctionArray.add("-");
 		setUpRecognitionArray();
+		System.out.println(postfixFunctionArray);
 		double prev = evaluateExpression(-xWidth / 2);
 		List<Double> asis = new ArrayList<>();
 		List<Double> bsis = new ArrayList<>();
-		for (double i = -(xWidth / 2); i < (xWidth / 2); i += (0.1 / (double) zoom)) { // nenapadl me lepsi zpusob, najde priblizne body zmeny, uzivatel si hold trochu pocka, co kdyz lezi na ose???
+		for (double i = -(xWidth / 2); i < (xWidth / 2); i += (1 / (double) zoom)) { // nenapadl me lepsi zpusob, najde priblizne body zmeny, uzivatel si hold trochu pocka, co kdyz lezi na ose???
 			double now = evaluateExpression(i);
 			if ((prev < 0 && now > 0) || (prev > 0 && now < 0)) {
-				asis.add(i - (0.1 / (double) zoom));
+				asis.add(i - (1 / (double) zoom));
 				bsis.add(i);
 			}
 			prev = now;
 		}
-		if(asis.isEmpty()){ // Alert
+		if (asis.isEmpty()) { // Alert
 			return null;
 		}
 		// for ArrayListSize
@@ -301,25 +303,25 @@ public class PostfixExpressionCacl {
 		for (int i = 0; i < asis.size(); i++) {
 			double start = asis.get(i);
 			double end = bsis.get(i);
-			if (start < end && ((evaluateExpression(start) < 0 && evaluateExpression(end) > 0) || (evaluateExpression(start) > 0 && evaluateExpression(end) < 0))) {
-				for (int j = 0; j < 100; j++) {
-					double middle = (start + end) / 2;
-					double valueForMiddle = evaluateExpression(middle);
-					if (valueForMiddle == 0 || Math.abs(middle) < 0.000_000_0001) {
-						toRetun.add(middle);
-					} else if (valueForMiddle < 0) {
-						end = middle;
-					} else {
-						start = middle;
-					}
+			System.out.println(start + ", " + end);
+			for (int j = 0; j < 100; j++) {
+				double middle = (start + end) / 2;
+				double valueForMiddle = evaluateExpression(middle);
+				if (valueForMiddle == 0 || Math.abs(valueForMiddle) < 0.000_001) {
+					System.out.println("dadsasd");
+					toRetun.add(middle);
+					break;
+				} 
+				double valueForStart = evaluateExpression(start);
+				if ((valueForMiddle <=0  && valueForStart <= 0) || (valueForMiddle >=0 && valueForStart >= 0) ) {
+					start = middle;
+				} else {
+					end = middle;
 				}
-			} else {
-				return null;
 			}
 		}
-		System.out.println("sa");
 		postfixFunctionArray = originalPostfixExpression;
-		return null;
+		return toRetun;
 	}
 
 	public void errorMessage(String s) {
@@ -345,7 +347,7 @@ public class PostfixExpressionCacl {
 
 	public static void main(String[] args) {
 		PostfixExpressionCacl p = new PostfixExpressionCacl("sin(x)*4-2", "x");
-		PostfixExpressionCacl c = new PostfixExpressionCacl("x+5", "x");
-		System.out.println(p.bisectionMethod(c.postfixFunctionArray, "x", 60, 10));
+		PostfixExpressionCacl c = new PostfixExpressionCacl("y+5", "y");
+		System.out.println(p.bisectionMethod(c.postfixFunctionArray, "y", 60, 10));
 	}
 }
