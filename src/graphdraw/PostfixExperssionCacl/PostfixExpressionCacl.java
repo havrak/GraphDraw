@@ -1,8 +1,5 @@
 package graphdraw.PostfixExperssionCacl;
 
-import com.sun.javafx.css.CalculatedValue;
-import graphdraw.ParsedExpressions;
-import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -271,6 +268,7 @@ public class PostfixExpressionCacl {
 
 	// dostane rozmery obrazovky (x) a zoom
 	// najde pruniky s x 
+	// mozna muze vracet HashMapu, hodnotama Y a X, ty vpocitat pro jednu funkcu
 	public List<Double> bisectionMethod(ArrayList<String> equation2, String variable, double xWidth, double zoom) {
 		if (!this.variable.equals(variable)) {
 			for (int i = 0; i < equation2.size(); i++) {
@@ -343,11 +341,5 @@ public class PostfixExpressionCacl {
 			return postfixFunctionArray;
 		}
 		return null;
-	}
-
-	public static void main(String[] args) {
-		PostfixExpressionCacl p = new PostfixExpressionCacl("sin(x)*4-2", "x");
-		PostfixExpressionCacl c = new PostfixExpressionCacl("y+5", "y");
-		System.out.println(p.bisectionMethod(c.postfixFunctionArray, "y", 60, 10));
 	}
 }

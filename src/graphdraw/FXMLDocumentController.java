@@ -18,18 +18,19 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
@@ -42,7 +43,7 @@ public class FXMLDocumentController {
 
 	class ResizableCanvas extends Canvas {
 
-		public ResizableCanvas() {
+		public ResizableCanvas() { // mohl by menit i rozmery TextAret - pricist k nim Vbox width
 			widthProperty().addListener(evt -> draw());
 			heightProperty().addListener(evt -> draw());
 		}
@@ -87,7 +88,12 @@ public class FXMLDocumentController {
 	private TextField Variable;
 	@FXML
 	private VBox functionChoserBar;
-	
+	@FXML
+	private BorderPane borderPane;
+	@FXML
+	private Button interBtn;
+
+	private TextArea intersestionModeTA = new TextArea();
 	private PostfixExpressionCacl pec;
 	private ParsedExpressions p = new ParsedExpressions();
 
@@ -97,6 +103,8 @@ public class FXMLDocumentController {
 	public String variable;
 	private Stage stage;
 	private int zoom;
+	private boolean stop = false;
+	private boolean amIInInterMode = false;
 
 	public void setStage(Stage stage) {
 		ResizableCanvas resizableCanvas = new ResizableCanvas();
@@ -112,6 +120,25 @@ public class FXMLDocumentController {
 		zoom = 10;
 		ZoomDisplay.setText("10");
 		drawScale();
+	}
+
+	//moveAway
+	@FXML
+	private void switchMode(ActionEvent event) {
+		if (!amIInInterMode) { // prejdu do modu, zmenit v Vboxu moznost, moznapredelat na listwiew, asi vlakno - bude fungovat jako terminal TextArea 
+			interBtn.setText("Back");
+			borderPane.setCenter(intersestionModeTA);
+			amIInInterMode = true;
+			TextField.setEditable(false); // udelat pro vse
+			VariableText.setEditable(false);
+
+		} else { // jdu do modu
+			interBtn.setText("Inter");
+			borderPane.setCenter(pane);
+			amIInInterMode = false;
+			TextField.setEditable(true);
+			VariableText.setEditable(false);
+		}
 	}
 
 	@FXML
@@ -247,7 +274,7 @@ public class FXMLDocumentController {
 					btn.setAlignment(Pos.CENTER_LEFT);
 					btn.setMaxWidth(functionChoserBar.getPrefWidth());
 					btn.setPrefWidth(functionChoserBar.getPrefWidth());
-					btn.setText("f("+variable+"):"+function);
+					btn.setText("f(" + variable + "):" + function);
 					btn.setOnAction(btnChoseFunctionPressed);
 					functionChoserBar.getChildren().add(btn);
 				}
@@ -328,16 +355,40 @@ public class FXMLDocumentController {
 	};
 	// nastavit barvu, TextArea, Variable, Postfix
 	EventHandler<ActionEvent> btnChoseFunctionPressed = event -> {
-		Button temp = (Button) event.getSource();
-		String name = temp.getText().split(":")[1];
-		int index = p.getIndexOfInfixFunction(name);
-		pec.setPostfixExpression(p.getPostfixExpression(index), p.getVariable(index));
-		gc.setStroke(p.getColor(index));
-		TextField.setText(name);
-		Variable.setText(p.getVariable(index));
+		if (!amIInInterMode) {
+			Button temp = (Button) event.getSource();
+			String name = temp.getText().split(":")[1];
+			int index = p.getIndexOfInfixFunction(name);
+			pec.setPostfixExpression(p.getPostfixExpression(index), p.getVariable(index));
+			gc.setStroke(p.getColor(index));
+			TextField.setText(name);
+			Variable.setText(p.getVariable(index));
+		} else {// zde se udela cele vypisovani
+			ArrayList<String> pecOut = (ArrayList<String>) pec.getParsedExpression().clone();
+			intersestionModeTA.setText("");
+			Button temp = (Button) event.getSource();
+			String name = temp.getText().split(":")[1];
+			int index = p.getIndexOfInfixFunction(name);
+			List<Double> points = pec.bisectionMethod(p.getPostfixExpression(index), p.getVariable(index), Canvas.getWidth() / zoom, zoom);
+			if (name.equals(TextField.getText())) {
+				intersestionModeTA.appendText("Vybraly dvě stejné funkce,\n");
+				intersestionModeTA.appendText("sdílejí mezi sebou všechny společné body,\n");
+			} else {
+				if (points == null) {
+					intersestionModeTA.appendText("Požadované funkce nemají na plátně žádný průsečík\n");
+				} else { // mezi funkcemi tou a tou je prunik zde a zde etc.
+					intersestionModeTA.appendText("Funkce: " + function + " a fukce: " + name + ", mají průniky v bodech:\n");
+					System.out.println(pecOut + " " + variable);
+					pec.setPostfixExpression(pecOut, variable);
+					for (Double point : points) {
+						intersestionModeTA.appendText("X: " + point + " Y:" + pec.evaluateExpression(Double.valueOf(point)) + "\n");
+					}
+				}
+			}
+			pec.setPostfixExpression(pecOut, variable); // nelze zmeni promenou, zle 
+		}
 	};
-	
-	
+
 	public void drawToCanvas(PointsCoordinates coordinates, boolean b) {
 		Point2D point1;
 		Point2D point2;
@@ -402,7 +453,7 @@ public class FXMLDocumentController {
 		}
 	}
 
-	public void reset(boolean b) {
+	public void reset(boolean b) { // overit zda se vse nuluje spravne - spravit
 		if (gc != null) {// zavola se driv nez se prida gc, mozna neni problem na windows
 			gc.setFill(Color.WHITE);
 			Color stroke = (Color) gc.getStroke();
@@ -415,6 +466,8 @@ public class FXMLDocumentController {
 				gc.strokeRect(Canvas.getWidth() - 96, Canvas.getHeight() - 61, Canvas.getWidth(), 36);
 				gc.strokeText("X: ", Canvas.getWidth() - 90, Canvas.getHeight() - 45);
 				gc.strokeText("Y: ", Canvas.getWidth() - 90, Canvas.getHeight() - 30);
+				p = new ParsedExpressions();
+				functionChoserBar.getChildren().clear();
 			}
 			gc.setStroke(stroke);
 		}
