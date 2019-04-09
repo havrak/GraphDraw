@@ -281,45 +281,48 @@ public class PostfixExpressionCacl {
 		postfixFunctionArray.addAll(equation2);
 		postfixFunctionArray.add("-");
 		setUpRecognitionArray();
-		System.out.println(postfixFunctionArray);
 		double prev = evaluateExpression(-xWidth / 2);
-		List<Double> asis = new ArrayList<>();
-		List<Double> bsis = new ArrayList<>();
+		List<Double> toRetun = new ArrayList<>();
 		for (double i = -(xWidth / 2); i < (xWidth / 2); i += (1 / (double) zoom)) { // nenapadl me lepsi zpusob, najde priblizne body zmeny, uzivatel si hold trochu pocka, co kdyz lezi na ose???
 			double now = evaluateExpression(i);
-			if ((prev < 0 && now > 0) || (prev > 0 && now < 0)) {
-				asis.add(i - (1 / (double) zoom));
-				bsis.add(i);
+			if (now == 0) {
+				toRetun.add(toAddCloseToWhloeNumber(i));
+			} else if ((prev < 0 && now > 0) || (prev > 0 && now < 0)) {
+				double start = i - (1 / (double) zoom);
+				double end = i;
+				for (int j = 0; j < 100; j++) {
+					double middle = (start + end) / 2;
+					double valueForMiddle = evaluateExpression(middle);
+					if (valueForMiddle == 0 || Math.abs(valueForMiddle) < 0.000_000_1) {
+						toRetun.add(toAddCloseToWhloeNumber(middle));
+						break;
+					}
+					double valueForStart = evaluateExpression(start);
+					if ((valueForMiddle <= 0 && valueForStart <= 0) || (valueForMiddle >= 0 && valueForStart >= 0)) {
+						start = middle;
+					} else {
+						end = middle;
+					}
+				}
 			}
 			prev = now;
 		}
-		if (asis.isEmpty()) { // Alert
-			return null;
-		}
-		// for ArrayListSize
-		List<Double> toRetun = new ArrayList<>();
-		for (int i = 0; i < asis.size(); i++) {
-			double start = asis.get(i);
-			double end = bsis.get(i);
-			System.out.println(start + ", " + end);
-			for (int j = 0; j < 100; j++) {
-				double middle = (start + end) / 2;
-				double valueForMiddle = evaluateExpression(middle);
-				if (valueForMiddle == 0 || Math.abs(valueForMiddle) < 0.000_001) {
-					System.out.println("dadsasd");
-					toRetun.add(middle);
-					break;
-				} 
-				double valueForStart = evaluateExpression(start);
-				if ((valueForMiddle <=0  && valueForStart <= 0) || (valueForMiddle >=0 && valueForStart >= 0) ) {
-					start = middle;
-				} else {
-					end = middle;
-				}
-			}
-		}
 		postfixFunctionArray = originalPostfixExpression;
-		return toRetun;
+		if (toRetun.isEmpty()) {
+			return null;
+		} else {
+			return toRetun;
+		}
+	}
+
+	private double toAddCloseToWhloeNumber(double middle) { // v FXML controlel na 4 des mista
+		double close = Math.abs(Math.round(middle) - middle);
+		System.out.println("asdsad "+close);
+		if (close < 0.000_000_001 && close > -0.000_000_001) { 
+			return Math.round(middle);
+		} else {
+			return middle;
+		}
 	}
 
 	public void errorMessage(String s) {
