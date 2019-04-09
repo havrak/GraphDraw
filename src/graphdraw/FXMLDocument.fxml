@@ -29,11 +29,11 @@
                </font>
             </Label>
             <TextField fx:id="TextField" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#drawGraphAction" prefHeight="26.0" prefWidth="314.0" promptText="Enter function here!" />
+            <TextField fx:id="ZoomDisplay" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#changeZoomAction" prefHeight="26.0" prefWidth="70.0" />
+            <Button mnemonicParsing="false" onAction="#btnPlusPressed" prefHeight="26.0" prefWidth="30.0" text="+" />
+            <Button mnemonicParsing="false" onAction="#btnMinusPressed" prefHeight="26.0" prefWidth="30.0" text="-" />
             <Button mnemonicParsing="false" onAction="#btnResetPressed" prefHeight="26.0" prefWidth="60.0" text="Reset" />
             <Button mnemonicParsing="false" onAction="#btnColorAction" prefHeight="26.0" prefWidth="60.0" text="Color" />
-            <Button mnemonicParsing="false" onAction="#btnPlusPressed" prefHeight="26.0" prefWidth="30.0" text="+" />
-            <TextField fx:id="ZoomDisplay" onKeyPressed="#changeZoomAction" prefHeight="26.0" prefWidth="70.0" />
-            <Button mnemonicParsing="false" onAction="#btnMinusPressed" prefHeight="26.0" prefWidth="30.0" text="-" />
             <Button mnemonicParsing="false" onAction="#btnSaveAction" prefHeight="26.0" prefWidth="60.0" text="Save" />
             <Button mnemonicParsing="false" onAction="#btnHelpPressed" prefHeight="26.0" prefWidth="60.0" text="Help" />
             <Button fx:id="interBtn" mnemonicParsing="false" onAction="#switchMode" prefWidth="60.0" text="Inter" />

@@ -103,7 +103,6 @@ public class FXMLDocumentController {
 	public String variable;
 	private Stage stage;
 	private int zoom;
-	private boolean stop = false;
 	private boolean amIInInterMode = false;
 
 	public void setStage(Stage stage) {
@@ -128,16 +127,19 @@ public class FXMLDocumentController {
 		if (!amIInInterMode) { // prejdu do modu, zmenit v Vboxu moznost, moznapredelat na listwiew, asi vlakno - bude fungovat jako terminal TextArea 
 			interBtn.setText("Back");
 			borderPane.setCenter(intersestionModeTA);
+			intersestionModeTA.setText("");
 			amIInInterMode = true;
 			TextField.setEditable(false); // udelat pro vse
 			VariableText.setEditable(false);
+			ZoomDisplay.setEditable(false);
 
 		} else { // jdu do modu
 			interBtn.setText("Inter");
 			borderPane.setCenter(pane);
 			amIInInterMode = false;
 			TextField.setEditable(true);
-			VariableText.setEditable(false);
+			VariableText.setEditable(true);
+			ZoomDisplay.setEditable(true);
 		}
 	}
 
@@ -169,6 +171,7 @@ public class FXMLDocumentController {
 		gc.setStroke(Color.BLACK);
 		p = new ParsedExpressions();
 		pec = new PostfixExpressionCacl(function, variable);
+		functionChoserBar.getChildren().clear();
 		drawScale();
 	}
 
@@ -253,34 +256,39 @@ public class FXMLDocumentController {
 
 			function = TextField.getText().toLowerCase().trim();
 			variable = Variable.getText();
-
-			pec = new PostfixExpressionCacl(function, variable);
-			for (double i = -(Canvas.getWidth() / (2 * zoom)); i < (Canvas.getWidth() / (2 * zoom)); i += (0.1 / (double) zoom)) {
-				Double d = pec.evaluateExpression(i) * zoom;
-				if (d.isNaN()) {
-					i = Double.POSITIVE_INFINITY;
-				} else {
-					coordinates.AddToMap(i * zoom, d);
+			if (!(variable.charAt(0) >= 'a' && variable.charAt(0) <= 'z')) {
+				Alert alert = new Alert(Alert.AlertType.ERROR);
+				alert.setHeaderText("Alert can be only letter");
+				alert.showAndWait();
+			} else {
+				pec = new PostfixExpressionCacl(function, variable);
+				for (double i = -(Canvas.getWidth() / (2 * zoom)); i < (Canvas.getWidth() / (2 * zoom)); i += (0.1 / (double) zoom)) {
+					Double d = pec.evaluateExpression(i) * zoom;
+					if (d.isNaN()) {
+						i = Double.POSITIVE_INFINITY;
+					} else {
+						coordinates.AddToMap(i * zoom, d);
+					}
 				}
-			}
-			ArrayList<String> temp = pec.getParsedExpression();
-			if (temp != null) {
-				if (p.addNewEntry(temp, function, variable, (Color) gc.getStroke())) { // diky antiAnalysing zmena barvy je nutne vykreslit nove a ne pres sebe
-					reDrawFunctions(true);
-					drawScale();
-				} else {
-					drawToCanvas(coordinates, true);
-					Button btn = new Button();
-					btn.setAlignment(Pos.CENTER_LEFT);
-					btn.setMaxWidth(functionChoserBar.getPrefWidth());
-					btn.setPrefWidth(functionChoserBar.getPrefWidth());
-					btn.setText("f(" + variable + "):" + function);
-					btn.setOnAction(btnChoseFunctionPressed);
-					functionChoserBar.getChildren().add(btn);
+				ArrayList<String> temp = pec.getParsedExpression();
+				if (temp != null) {
+					if (p.addNewEntry(temp, function, variable, (Color) gc.getStroke())) { // diky antiAnalysing zmena barvy je nutne vykreslit nove a ne pres sebe
+						reDrawFunctions(true);
+						drawScale();
+					} else {
+						drawToCanvas(coordinates, true);
+						Button btn = new Button();
+						btn.setAlignment(Pos.CENTER_LEFT);
+						btn.setMaxWidth(functionChoserBar.getPrefWidth());
+						btn.setPrefWidth(functionChoserBar.getPrefWidth());
+						btn.setText("f(" + variable + "):" + function);
+						btn.setOnAction(btnChoseFunctionPressed);
+						functionChoserBar.getChildren().add(btn);
+					}
 				}
+				System.out.println(p.toString());
+				System.out.println("Time:\t" + (System.nanoTime() - time) / 1000_000 + "ms");
 			}
-			System.out.println(p.toString());
-			System.out.println("Time:\t" + (System.nanoTime() - time) / 1000_000 + "ms");
 			System.out.println("-----------------");
 		}
 	}
@@ -321,9 +329,6 @@ public class FXMLDocumentController {
 	public void keyTypedInVariable(KeyEvent event) { //nefunguje
 		System.out.println(Variable.getText());
 		if (Variable.getText().length() > 0) {
-			Alert alert = new Alert(Alert.AlertType.ERROR);
-			alert.setHeaderText("Variable can be only one character");
-			alert.showAndWait();
 			Variable.setText("");
 		}
 	}
@@ -361,6 +366,8 @@ public class FXMLDocumentController {
 			int index = p.getIndexOfInfixFunction(name);
 			pec.setPostfixExpression(p.getPostfixExpression(index), p.getVariable(index));
 			gc.setStroke(p.getColor(index));
+			function = name;
+			variable = p.getVariable(index);
 			TextField.setText(name);
 			Variable.setText(p.getVariable(index));
 		} else {// zde se udela cele vypisovani
@@ -369,6 +376,7 @@ public class FXMLDocumentController {
 			Button temp = (Button) event.getSource();
 			String name = temp.getText().split(":")[1];
 			int index = p.getIndexOfInfixFunction(name);
+			System.out.println(p.getPostfixExpression(index) + " " + p.getPostfixExpression(index));
 			List<Double> points = pec.bisectionMethod(p.getPostfixExpression(index), p.getVariable(index), Canvas.getWidth() / zoom, zoom);
 			if (name.equals(TextField.getText())) {
 				intersestionModeTA.appendText("Vybraly dvě stejné funkce,\n");
@@ -378,10 +386,11 @@ public class FXMLDocumentController {
 					intersestionModeTA.appendText("Požadované funkce nemají na plátně žádný průsečík\n");
 				} else { // mezi funkcemi tou a tou je prunik zde a zde etc.
 					intersestionModeTA.appendText("Funkce: " + function + " a fukce: " + name + ", mají průniky v bodech:\n");
-					System.out.println(pecOut + " " + variable);
+					 // asdas
 					pec.setPostfixExpression(pecOut, variable);
+					System.out.println(pecOut + " " + variable + " " +pec.getParsedExpression());
 					for (Double point : points) {
-						intersestionModeTA.appendText("X: " + point + " Y:" + pec.evaluateExpression(Double.valueOf(point)) + "\n");
+						intersestionModeTA.appendText("[" + String.valueOf((double) ((int) (Double.valueOf(point) * 10000)) / 10000) + "," + String.valueOf((double) ((int) (pec.evaluateExpression(Double.valueOf(point)) * 10000)) / 10000) + "]\n");
 					}
 				}
 			}
@@ -453,7 +462,7 @@ public class FXMLDocumentController {
 		}
 	}
 
-	public void reset(boolean b) { // overit zda se vse nuluje spravne - spravit
+	public void reset(boolean b) {
 		if (gc != null) {// zavola se driv nez se prida gc, mozna neni problem na windows
 			gc.setFill(Color.WHITE);
 			Color stroke = (Color) gc.getStroke();
@@ -466,8 +475,6 @@ public class FXMLDocumentController {
 				gc.strokeRect(Canvas.getWidth() - 96, Canvas.getHeight() - 61, Canvas.getWidth(), 36);
 				gc.strokeText("X: ", Canvas.getWidth() - 90, Canvas.getHeight() - 45);
 				gc.strokeText("Y: ", Canvas.getWidth() - 90, Canvas.getHeight() - 30);
-				p = new ParsedExpressions();
-				functionChoserBar.getChildren().clear();
 			}
 			gc.setStroke(stroke);
 		}

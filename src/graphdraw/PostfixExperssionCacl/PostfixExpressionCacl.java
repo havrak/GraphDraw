@@ -61,7 +61,6 @@ public class PostfixExpressionCacl {
 			}
 			if (wasItALetter == false && firstLetter == false) {
 				String temp = infixFunction.substring(startingIndexOfLetter, i);
-				firstLetter = true;
 				switch (temp.length()) {
 					case 1:
 						if (temp.equals(variable)) {
@@ -267,8 +266,7 @@ public class PostfixExpressionCacl {
 	}
 
 	// dostane rozmery obrazovky (x) a zoom
-	// najde pruniky s x 
-	// mozna muze vracet HashMapu, hodnotama Y a X, ty vpocitat pro jednu funkcu
+	// najde pruniky s x
 	public List<Double> bisectionMethod(ArrayList<String> equation2, String variable, double xWidth, double zoom) {
 		if (!this.variable.equals(variable)) {
 			for (int i = 0; i < equation2.size(); i++) {
@@ -315,10 +313,9 @@ public class PostfixExpressionCacl {
 		}
 	}
 
-	private double toAddCloseToWhloeNumber(double middle) { // v FXML controlel na 4 des mista
+	private double toAddCloseToWhloeNumber(double middle) { // v FXML controlel na 4 des mista, x/4-5, x-5
 		double close = Math.abs(Math.round(middle) - middle);
-		System.out.println("asdsad "+close);
-		if (close < 0.000_000_001 && close > -0.000_000_001) { 
+		if (close < 0.000_000_1 && close > -0.000_000_1) { 
 			return Math.round(middle);
 		} else {
 			return middle;
