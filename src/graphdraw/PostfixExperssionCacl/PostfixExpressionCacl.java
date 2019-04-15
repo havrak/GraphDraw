@@ -23,7 +23,10 @@ public class PostfixExpressionCacl {
 		parse();
 
 	}
-
+	public PostfixExpressionCacl(ArrayList<String> postfixFunction, String variable){
+		this.postfixFunctionArray = postfixFunction;
+		this.variable = variable;
+	}
 	// Shunting-yard algorithm
 	private void parse() {
 		double time = System.nanoTime();

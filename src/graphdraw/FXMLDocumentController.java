@@ -300,7 +300,7 @@ public class FXMLDocumentController {
 	}
 
 	@FXML
-	private void btnSaveAction(Event event) {
+	private void menuSaveAction(Event event) {
 		reset(false);
 		reDrawFunctions(false);
 		drawScale();
@@ -323,6 +323,18 @@ public class FXMLDocumentController {
 		reset(true);
 		reDrawFunctions(true);
 		drawScale();
+	}
+
+	@FXML
+	private void menuExportAction(Event event) {
+		p.exportToJSON();
+	}
+
+	@FXML
+	private void menuImportAction(Event event) { // if endswith JSON ?????
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Select File");
+		p.importFromJSON(fileChooser.showOpenDialog(this.stage));
 	}
 
 	@FXML
@@ -360,10 +372,10 @@ public class FXMLDocumentController {
 	};
 	// nastavit barvu, TextArea, Variable, Postfix
 	EventHandler<ActionEvent> btnChoseFunctionPressed = event -> {
+		Button temp = (Button) event.getSource();
+		String name = temp.getText().split(":")[1];
+		int index = p.getIndexOfInfixFunction(name);
 		if (!amIInInterMode) {
-			Button temp = (Button) event.getSource();
-			String name = temp.getText().split(":")[1];
-			int index = p.getIndexOfInfixFunction(name);
 			pec.setPostfixExpression(p.getPostfixExpression(index), p.getVariable(index));
 			gc.setStroke(p.getColor(index));
 			function = name;
@@ -373,9 +385,6 @@ public class FXMLDocumentController {
 		} else {// zde se udela cele vypisovani
 			ArrayList<String> pecOut = (ArrayList<String>) pec.getParsedExpression().clone();
 			intersestionModeTA.setText("");
-			Button temp = (Button) event.getSource();
-			String name = temp.getText().split(":")[1];
-			int index = p.getIndexOfInfixFunction(name);
 			System.out.println(p.getPostfixExpression(index) + " " + p.getPostfixExpression(index));
 			List<Double> points = pec.bisectionMethod(p.getPostfixExpression(index), p.getVariable(index), Canvas.getWidth() / zoom, zoom);
 			if (name.equals(TextField.getText())) {
@@ -383,18 +392,17 @@ public class FXMLDocumentController {
 				intersestionModeTA.appendText("sdílejí mezi sebou všechny společné body,\n");
 			} else {
 				if (points == null) {
-					intersestionModeTA.appendText("Požadované funkce nemají na plátně žádný průsečík\n");
+					intersestionModeTA.appendText("Požadované funkce nemají na plátně žádný průnik\n");
 				} else { // mezi funkcemi tou a tou je prunik zde a zde etc.
 					intersestionModeTA.appendText("Funkce: " + function + " a fukce: " + name + ", mají průniky v bodech:\n");
-					 // asdas
 					pec.setPostfixExpression(pecOut, variable);
-					System.out.println(pecOut + " " + variable + " " +pec.getParsedExpression());
+					System.out.println(pecOut + " " + variable + " " + pec.getParsedExpression());
 					for (Double point : points) {
 						intersestionModeTA.appendText("[" + String.valueOf((double) ((int) (Double.valueOf(point) * 10000)) / 10000) + "," + String.valueOf((double) ((int) (pec.evaluateExpression(Double.valueOf(point)) * 10000)) / 10000) + "]\n");
 					}
 				}
 			}
-			pec.setPostfixExpression(pecOut, variable); // nelze zmeni promenou, zle 
+			pec.setPostfixExpression(pecOut, variable);
 		}
 	};
 
