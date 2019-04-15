@@ -79,13 +79,13 @@ public class FXMLDocumentController {
 	private Pane pane;
 	private ResizableCanvas Canvas;
 	@FXML
-	private TextField TextField;
+	private TextField infixTF;
 	@FXML
-	private TextField ZoomDisplay;
+	private TextField zoomTF;
 	@FXML
-	private TextField VariableText;
+	private TextField calcForVarTF;
 	@FXML
-	private TextField Variable;
+	private TextField variableTF;
 	@FXML
 	private VBox functionChoserBar;
 	@FXML
@@ -99,7 +99,7 @@ public class FXMLDocumentController {
 
 	private CustomColorDialog colorDialog;
 	private GraphicsContext gc;
-	public String function;
+	public String function; // aktualne vybrana funkce
 	public String variable;
 	private Stage stage;
 	private int zoom;
@@ -117,7 +117,7 @@ public class FXMLDocumentController {
 		gc.setFont(new Font(10));
 		reset(true);
 		zoom = 10;
-		ZoomDisplay.setText("10");
+		zoomTF.setText("10");
 		drawScale();
 	}
 
@@ -129,17 +129,17 @@ public class FXMLDocumentController {
 			borderPane.setCenter(intersestionModeTA);
 			intersestionModeTA.setText("");
 			amIInInterMode = true;
-			TextField.setEditable(false); // udelat pro vse
-			VariableText.setEditable(false);
-			ZoomDisplay.setEditable(false);
+			infixTF.setEditable(false); // udelat pro vse
+			calcForVarTF.setEditable(false);
+			zoomTF.setEditable(false);
 
 		} else { // jdu do modu
 			interBtn.setText("Inter");
 			borderPane.setCenter(pane);
 			amIInInterMode = false;
-			TextField.setEditable(true);
-			VariableText.setEditable(true);
-			ZoomDisplay.setEditable(true);
+			infixTF.setEditable(true);
+			calcForVarTF.setEditable(true);
+			zoomTF.setEditable(true);
 		}
 	}
 
@@ -164,10 +164,12 @@ public class FXMLDocumentController {
 	private void btnResetPressed(ActionEvent event) {
 		reset(true);
 		zoom = 10;
-		ZoomDisplay.setText("10");
+		zoomTF.setText("10");
 		variable = "";
 		function = "";
-		VariableText.setText("");
+		calcForVarTF.setText("");
+		infixTF.setText("");
+		variableTF.setText("");
 		gc.setStroke(Color.BLACK);
 		p = new ParsedExpressions();
 		pec = new PostfixExpressionCacl(function, variable);
@@ -182,7 +184,7 @@ public class FXMLDocumentController {
 			reset(true);
 			reDrawFunctions(true);
 		}
-		ZoomDisplay.setText(String.valueOf(zoom));
+		zoomTF.setText(String.valueOf(zoom));
 	}
 
 	@FXML
@@ -192,7 +194,7 @@ public class FXMLDocumentController {
 			reset(true);
 			reDrawFunctions(true);
 		}
-		ZoomDisplay.setText(String.valueOf(zoom));
+		zoomTF.setText(String.valueOf(zoom));
 	}
 
 	@FXML
@@ -203,12 +205,12 @@ public class FXMLDocumentController {
 		alert.getDialogPane().setMinSize(330, 130);
 		if (event.getCode().equals(KeyCode.ENTER)) {
 			try {
-				if (Integer.valueOf(ZoomDisplay.getText()) >= 10 && Integer.valueOf(ZoomDisplay.getText()) <= 100) {
-					zoom = Integer.valueOf(ZoomDisplay.getText());
+				if (Integer.valueOf(zoomTF.getText()) >= 10 && Integer.valueOf(zoomTF.getText()) <= 100) {
+					zoom = Integer.valueOf(zoomTF.getText());
 					reset(true);
 					reDrawFunctions(true);
 				} else {
-					ZoomDisplay.setText(String.valueOf(zoom));
+					zoomTF.setText(String.valueOf(zoom));
 					alert.setTitle("Too big zoom or too small");
 					alert.setContentText("Zoom value is out of range.\n"
 							+ "Zoom can only have value between 10 and 100.");
@@ -216,7 +218,7 @@ public class FXMLDocumentController {
 
 				}
 			} catch (NumberFormatException e) {
-				ZoomDisplay.setText(String.valueOf(zoom));
+				zoomTF.setText(String.valueOf(zoom));
 				alert.setTitle("Not a natural number");
 				alert.setContentText("Zoom value can only be natural nmber");
 				alert.showAndWait();
@@ -229,12 +231,12 @@ public class FXMLDocumentController {
 	EventHandler<ScrollEvent> canvasScroll = event -> {
 		if (event.getDeltaY() < 0 && zoom > 10) {
 			zoom--;
-			ZoomDisplay.setText(String.valueOf(zoom));
+			zoomTF.setText(String.valueOf(zoom));
 			reset(true);
 			reDrawFunctions(true);
 		} else if (event.getDeltaY() > 0 && zoom < 100) {
 			zoom++;
-			ZoomDisplay.setText(String.valueOf(zoom));
+			zoomTF.setText(String.valueOf(zoom));
 			reset(true);
 			reDrawFunctions(true);
 		}
@@ -243,7 +245,7 @@ public class FXMLDocumentController {
 	@FXML
 	private void specValueAction(KeyEvent event) {
 		if (event.getCode().equals(KeyCode.ENTER)) {
-			VariableText.setText("For value: " + VariableText.getText() + ", f(" + Variable.getText() + ") = " + String.valueOf(pec.evaluateExpression(Double.valueOf(VariableText.getText()))));
+			calcForVarTF.setText("For value: " + calcForVarTF.getText() + ", f(" + variableTF.getText() + ") = " + String.valueOf(pec.evaluateExpression(Double.valueOf(calcForVarTF.getText()))));
 		}
 	}
 
@@ -254,8 +256,8 @@ public class FXMLDocumentController {
 			double time = System.nanoTime();
 			PointsCoordinates coordinates = new PointsCoordinates(new ArrayList<>(), new ArrayList<>());
 
-			function = TextField.getText().toLowerCase().trim();
-			variable = Variable.getText();
+			function = infixTF.getText().toLowerCase().trim();
+			variable = variableTF.getText();
 			if (!(variable.charAt(0) >= 'a' && variable.charAt(0) <= 'z')) {
 				Alert alert = new Alert(Alert.AlertType.ERROR);
 				alert.setHeaderText("Alert can be only letter");
@@ -327,29 +329,48 @@ public class FXMLDocumentController {
 
 	@FXML
 	private void menuExportAction(Event event) {
-		p.exportToJSON();
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Select File");
+		File file = fileChooser.showSaveDialog(this.stage);
+		p.exportToJSON(file);
 	}
 
 	@FXML
 	private void menuImportAction(Event event) {
+		int size = p.getSize();
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Select File");
 		if (p.importFromJSON(fileChooser.showOpenDialog(this.stage))) {
+			for (int i = size; i < p.getSize(); i++) {
+				Button btn = new Button();
+				btn.setAlignment(Pos.CENTER_LEFT);
+				btn.setMaxWidth(functionChoserBar.getPrefWidth());
+				btn.setPrefWidth(functionChoserBar.getPrefWidth());
+				btn.setText("f(" + p.getVariable(i) + "):" + p.getInfixExpression(i));
+				btn.setOnAction(btnChoseFunctionPressed);
+				functionChoserBar.getChildren().add(btn);
+			}
 			reDrawFunctions(true);
+		}
+		if (size != p.getSize()) {
+			infixTF.setText(p.getInfixExpression(p.getSize() - 1));
+			variableTF.setText(p.getVariable(p.getSize() - 1));
+			function = p.getInfixExpression(p.getSize() - 1);
+			variable = p.getVariable(p.getSize() - 1);
 		}
 	}
 
 	@FXML
 	public void keyTypedInVariable(KeyEvent event) { //nefunguje
-		System.out.println(Variable.getText());
-		if (Variable.getText().length() > 0) {
-			Variable.setText("");
+		System.out.println(variableTF.getText());
+		if (variableTF.getText().length() > 0) {
+			variableTF.setText("");
 		}
 	}
 
 	EventHandler<MouseEvent> mouseMovedInCanvas = event -> {
-		if (pec != null) {
-			double x = (event.getX() - Canvas.getWidth() / 2) / zoom;
+		if (!p.isEmpty()) { // hceme aby nec bylo ulozeneho
+			double x = (event.getX() - Canvas.getWidth() / 2) / zoom; /// hazi null pointer pri 
 			Double y = pec.evaluateExpression(x);
 			Paint c = gc.getStroke();
 			gc.fillRect(Canvas.getWidth() - 95, Canvas.getHeight() - 60, Canvas.getWidth(), 34);
@@ -382,14 +403,14 @@ public class FXMLDocumentController {
 			gc.setStroke(p.getColor(index));
 			function = name;
 			variable = p.getVariable(index);
-			TextField.setText(name);
-			Variable.setText(p.getVariable(index));
+			infixTF.setText(name);
+			variableTF.setText(p.getVariable(index));
 		} else {// zde se udela cele vypisovani
 			ArrayList<String> pecOut = (ArrayList<String>) pec.getParsedExpression().clone();
 			intersestionModeTA.setText("");
 			System.out.println(p.getPostfixExpression(index) + " " + p.getPostfixExpression(index));
 			List<Double> points = pec.bisectionMethod(p.getPostfixExpression(index), p.getVariable(index), Canvas.getWidth() / zoom, zoom);
-			if (name.equals(TextField.getText())) {
+			if (name.equals(infixTF.getText())) {
 				intersestionModeTA.appendText("Vybraly dvě stejné funkce,\n");
 				intersestionModeTA.appendText("sdílejí mezi sebou všechny společné body,\n");
 			} else {
@@ -420,16 +441,26 @@ public class FXMLDocumentController {
 			}
 		}
 		if (b) {
+			Color temp = (Color) gc.getStroke();
+			gc.setStroke(Color.BLACK);
 			gc.fillRect(Canvas.getWidth() - 95, Canvas.getHeight() - 60, Canvas.getWidth(), 34);
 			gc.strokeText("X: ", Canvas.getWidth() - 90, Canvas.getHeight() - 45);
 			gc.strokeText("Y: ", Canvas.getWidth() - 90, Canvas.getHeight() - 30);
+			gc.setStroke(temp);
 		}
 	}
 
 	public void reDrawFunctions(boolean b) {
+		boolean needToReturn = false;
+		ArrayList<String> originalPostfix = null;
+		String originalVariable = null;
+		if (pec != null) {
+			originalPostfix = pec.getParsedExpression();
+			originalVariable = pec.getVariable();
+			needToReturn = true;
+		}
 		for (int i = 0; i < p.getSize(); i++) {
 			gc.setStroke(p.getColor(i));
-			System.out.println(p.getPostfixExpression(i) + " " + p.getVariable(i));
 			if (pec == null) {
 				pec = new PostfixExpressionCacl(p.getPostfixExpression(i), p.getVariable(i));
 			} else {
@@ -445,6 +476,9 @@ public class FXMLDocumentController {
 				}
 			}
 			drawToCanvas(coordinates, b);
+		}
+		if (needToReturn) {
+			pec.setPostfixExpression(originalPostfix, originalVariable);
 		}
 		drawScale();
 	}

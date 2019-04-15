@@ -250,6 +250,7 @@ public class PostfixExpressionCacl {
 								break;
 							default:
 								isExpressionCalculable = false;
+								System.out.println(postfixFunctionArray + " "+ recognitionArray + " "+ this.variable);
 								errorMessage(postfixFunctionArray.get(i));
 								return Double.NaN;
 						}
@@ -346,5 +347,8 @@ public class PostfixExpressionCacl {
 			return postfixFunctionArray;
 		}
 		return null;
+	}
+	public String getVariable(){
+		return variable;
 	}
 }

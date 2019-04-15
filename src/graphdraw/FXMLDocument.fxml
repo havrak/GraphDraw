@@ -20,7 +20,7 @@
                   <Font size="19.0" />
                </font>
             </Label>
-            <TextField fx:id="Variable" maxWidth="26.0" minWidth="26.0" onKeyTyped="#keyTypedInVariable" prefHeight="26.0" prefWidth="26.0">
+            <TextField fx:id="variableTF" maxWidth="26.0" minWidth="26.0" onKeyTyped="#keyTypedInVariable" prefHeight="26.0" prefWidth="26.0">
                <font>
                   <Font size="12.0" />
                </font>
@@ -30,8 +30,8 @@
                   <Font size="19.0" />
                </font>
             </Label>
-            <TextField fx:id="TextField" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#drawGraphAction" prefHeight="26.0" prefWidth="314.0" promptText="Enter function here!" />
-            <TextField fx:id="ZoomDisplay" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#changeZoomAction" prefHeight="26.0" prefWidth="70.0" />
+            <TextField fx:id="infixTF" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#drawGraphAction" prefHeight="26.0" prefWidth="314.0" promptText="Enter function here!" />
+            <TextField fx:id="zoomTF" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#changeZoomAction" prefHeight="26.0" prefWidth="70.0" />
             <Button mnemonicParsing="false" onAction="#btnPlusPressed" prefHeight="26.0" prefWidth="30.0" text="+" />
             <Button mnemonicParsing="false" onAction="#btnMinusPressed" prefHeight="26.0" prefWidth="30.0" text="-" />
             <Button mnemonicParsing="false" onAction="#btnResetPressed" prefHeight="26.0" prefWidth="60.0" text="Reset" />
@@ -51,7 +51,7 @@
    <bottom>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="26.0" prefWidth="803.0">
          <children>
-            <TextField fx:id="VariableText" alignment="BOTTOM_LEFT" onKeyPressed="#specValueAction" prefHeight="26.0" prefWidth="800.0" promptText="Calculate for specific value" />
+            <TextField fx:id="calcForVarTF" alignment="BOTTOM_LEFT" onKeyPressed="#specValueAction" prefHeight="26.0" prefWidth="800.0" promptText="Calculate for specific value" />
          </children>
       </HBox>
    </bottom>

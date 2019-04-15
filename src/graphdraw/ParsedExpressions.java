@@ -32,6 +32,10 @@ public class ParsedExpressions {
 		return colors.get(i);
 	}
 
+	public String getInfixExpression(int i) {
+		return intfixExpressions.get(i);
+	}
+
 	public ArrayList<String> getPostfixExpression(int i) {
 		return postfixExpressions.get(i);
 	}
@@ -42,6 +46,9 @@ public class ParsedExpressions {
 
 	public int getSize() {
 		return colors.size();
+	}
+	public boolean isEmpty(){
+		return colors.isEmpty();
 	}
 
 	public int getIndexOfInfixFunction(String infix) {
@@ -93,21 +100,21 @@ public class ParsedExpressions {
 		return "colors:\t\t\t" + colors + "\n" + "functions (Postfix):\t" + postfixExpressions + "\n" + "functions (Infix):\t" + intfixExpressions + "\n" + "variables:\t\t" + variables;
 	}
 
-	public void exportToJSON() {
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File("function.json")))) {// predelat na FileChooser
+	public void exportToJSON(File file) {
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {// predelat na FileChooser
 			bw.append("{\n");
 			bw.append("\t\"functions\":[\n");
 			for (int i = 0; i < getSize(); i++) {
 				String color = colors.get(i).toString();
 				color = "#" + color.substring(2, color.length() - 2);
 				bw.append("\t\t{\n");
-				bw.append("\t\t\"infix\":\"" + intfixExpressions.get(i) + "\",\n");
-				bw.append("\t\t\"postfix\":\"" + postfixExpressions.get(i).toString().substring(1, postfixExpressions.get(i).toString().length() - 1) + "\",\n");
-				bw.append("\t\t\"color\":\"" + color + "\",\n");
-				bw.append("\t\t\"variable\":\"" + variables.get(i) + "\"\n");
+				bw.append("\t\t\t\"infix\":\"" + intfixExpressions.get(i) + "\",\n");
+				bw.append("\t\t\t\"postfix\":\"" + postfixExpressions.get(i).toString().substring(1, postfixExpressions.get(i).toString().length() - 1) + "\",\n");
+				bw.append("\t\t\t\"color\":\"" + color + "\",\n");
+				bw.append("\t\t\t\"variable\":\"" + variables.get(i) + "\"\n");
 				if (i == getSize() - 1) {
 					bw.append("\t\t}\n");
-				}else{
+				} else {
 					bw.append("\t\t},\n");
 				}
 			}
