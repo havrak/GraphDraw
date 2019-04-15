@@ -1,6 +1,7 @@
 package graphdraw.PostfixExperssionCacl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import javafx.scene.control.Alert;
@@ -26,6 +27,7 @@ public class PostfixExpressionCacl {
 	public PostfixExpressionCacl(ArrayList<String> postfixFunction, String variable){
 		this.postfixFunctionArray = postfixFunction;
 		this.variable = variable;
+		setUpRecognitionArray();
 	}
 	// Shunting-yard algorithm
 	private void parse() {

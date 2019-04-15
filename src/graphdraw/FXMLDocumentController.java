@@ -331,10 +331,12 @@ public class FXMLDocumentController {
 	}
 
 	@FXML
-	private void menuImportAction(Event event) { // if endswith JSON ?????
+	private void menuImportAction(Event event) {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Select File");
-		p.importFromJSON(fileChooser.showOpenDialog(this.stage));
+		if (p.importFromJSON(fileChooser.showOpenDialog(this.stage))) {
+			reDrawFunctions(true);
+		}
 	}
 
 	@FXML
@@ -427,7 +429,12 @@ public class FXMLDocumentController {
 	public void reDrawFunctions(boolean b) {
 		for (int i = 0; i < p.getSize(); i++) {
 			gc.setStroke(p.getColor(i));
-			pec.setPostfixExpression(p.getPostfixExpression(i), p.getVariable(i));
+			System.out.println(p.getPostfixExpression(i) + " " + p.getVariable(i));
+			if (pec == null) {
+				pec = new PostfixExpressionCacl(p.getPostfixExpression(i), p.getVariable(i));
+			} else {
+				pec.setPostfixExpression(p.getPostfixExpression(i), p.getVariable(i));
+			}
 			PointsCoordinates coordinates = new PointsCoordinates(new ArrayList<>(), new ArrayList<>());
 			for (double x = -(Canvas.getWidth() / (2 * zoom)); x < (Canvas.getWidth() / (2 * zoom)); x += (0.1 / (double) zoom)) {
 				Double d = pec.evaluateExpression(x) * zoom;

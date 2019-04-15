@@ -94,22 +94,26 @@ public class ParsedExpressions {
 	}
 
 	public void exportToJSON() {
-		try(BufferedWriter bw = new BufferedWriter(new FileWriter(new File("function.json")))) {// predelat na FileChooser
-			bw.append("{");
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File("function.json")))) {// predelat na FileChooser
+			bw.append("{\n");
+			bw.append("\t\"functions\":[\n");
 			for (int i = 0; i < getSize(); i++) {
 				String color = colors.get(i).toString();
-				color = "#"+color.substring(2, color.length()-2);
-				System.out.println(color);
-				bw.append("\"function\":{");
-				bw.append("\"infix\":\""+intfixExpressions.get(i)+"\"");
-				bw.append("\"postfix\":\""+postfixExpressions.get(i).toString().substring(1, postfixExpressions.get(i).toString().length()-1)+"\"");
-				bw.append("\"color\":\""+color+"\"");
-				bw.append("\"variable\":\""+variables.get(i)+"\"");
-				bw.append("}");
+				color = "#" + color.substring(2, color.length() - 2);
+				bw.append("\t\t{\n");
+				bw.append("\t\t\"infix\":\"" + intfixExpressions.get(i) + "\",\n");
+				bw.append("\t\t\"postfix\":\"" + postfixExpressions.get(i).toString().substring(1, postfixExpressions.get(i).toString().length() - 1) + "\",\n");
+				bw.append("\t\t\"color\":\"" + color + "\",\n");
+				bw.append("\t\t\"variable\":\"" + variables.get(i) + "\"\n");
+				if (i == getSize() - 1) {
+					bw.append("\t\t}\n");
+				}else{
+					bw.append("\t\t},\n");
+				}
 			}
-			
-			bw.append("}");
-			
+			bw.append("\t]\n");
+			bw.append("}\n");
+
 		} catch (IOException ex) {
 			Logger.getLogger(ParsedExpressions.class.getName()).log(Level.SEVERE, null, ex);
 		}
@@ -127,14 +131,15 @@ public class ParsedExpressions {
 			Logger.getLogger(ParsedExpressions.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		JSONObject obj = new JSONObject(fileContent);
-		JSONArray arr = obj.getJSONArray("function");
+		JSONArray arr = obj.getJSONArray("functions");
 		for (int i = 0; i < arr.length(); i++) {
 			String infixToAdd = arr.getJSONObject(i).getString("infix");
 			String postfixToAdd = arr.getJSONObject(i).getString("postfix");
 			String variableToAdd = arr.getJSONObject(i).getString("variable");
 			String colorToAdd = arr.getJSONObject(i).getString("color");
 			if (infixToAdd != null && postfixToAdd != null && variableToAdd != null && colorToAdd != null) { // zkotrolovat podminku  
-				ArrayList<String> postfix = (ArrayList<String>) Arrays.asList(postfixToAdd.split(","));
+				ArrayList<String> postfix = new ArrayList<>();
+				postfix.addAll(Arrays.asList(postfixToAdd.split(", ")));
 				PostfixExpressionCacl temp = new PostfixExpressionCacl(postfix, variableToAdd);
 				temp.evaluateExpression(2);
 				if (temp.getParsedExpression() != null) { // alert
