@@ -300,7 +300,9 @@ public class FXMLDocumentController {
 		colorDialog.getDialog().showAndWait();
 		gc.setStroke(colorDialog.getCustomColor());
 	}
-
+	
+	
+	// nakresli obrazek neni potreba, kreslit do cnavas
 	@FXML
 	private void menuSaveAction(Event event) {
 		reset(false);
@@ -367,7 +369,8 @@ public class FXMLDocumentController {
 			variableTF.setText("");
 		}
 	}
-
+	// nakresli obrazek grafu - ten bide ulozen v image, globani promena, zmenena po kazdem nakreselni
+	// graphdraw, reDrawGraphs
 	EventHandler<MouseEvent> mouseMovedInCanvas = event -> {
 		if (!p.isEmpty()) { // hceme aby nec bylo ulozeneho
 			double x = (event.getX() - Canvas.getWidth() / 2) / zoom; /// hazi null pointer pri 

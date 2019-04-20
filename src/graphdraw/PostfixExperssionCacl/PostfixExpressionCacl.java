@@ -1,7 +1,6 @@
 package graphdraw.PostfixExperssionCacl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import javafx.scene.control.Alert;
@@ -184,7 +183,7 @@ public class PostfixExpressionCacl {
 						stack.push(variable);
 						break;
 					case 'd':
-						stack.push(Double.valueOf(postfixFunctionArray.get(i)));
+						stack.push(Double.parseDouble(postfixFunctionArray.get(i)));
 						break;
 					default:
 						switch (postfixFunctionArray.get(i)) {

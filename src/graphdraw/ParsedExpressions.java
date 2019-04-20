@@ -4,7 +4,6 @@ import graphdraw.PostfixExperssionCacl.PostfixExpressionCacl;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -25,7 +24,7 @@ public class ParsedExpressions {
 
 	private final List<Color> colors = new ArrayList<>();
 	private final List<ArrayList<String>> postfixExpressions = new ArrayList<>();
-	private final List<String> variables = new ArrayList<String>();
+	private final List<String> variables = new ArrayList<>();
 	private final List<String> intfixExpressions = new ArrayList<>();
 
 	public Color getColor(int i) {
@@ -120,7 +119,6 @@ public class ParsedExpressions {
 			}
 			bw.append("\t]\n");
 			bw.append("}\n");
-
 		} catch (IOException ex) {
 			Logger.getLogger(ParsedExpressions.class.getName()).log(Level.SEVERE, null, ex);
 		}
