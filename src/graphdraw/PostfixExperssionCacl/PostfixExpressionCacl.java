@@ -289,7 +289,7 @@ public class PostfixExpressionCacl {
 		for (double i = -(xWidth / 2); i < (xWidth / 2); i += (1 / (double) zoom)) { // nenapadl me lepsi zpusob, najde priblizne body zmeny, uzivatel si hold trochu pocka, co kdyz lezi na ose???
 			double now = evaluateExpression(i);
 			if (now == 0) {
-				toRetun.add(toAddCloseToWhloeNumber(i));
+				toRetun.add(toAddCloseToWholeNumber(i));
 			} else if ((prev < 0 && now > 0) || (prev > 0 && now < 0)) {
 				double start = i - (1 / (double) zoom);
 				double end = i;
@@ -297,7 +297,7 @@ public class PostfixExpressionCacl {
 					double middle = (start + end) / 2;
 					double valueForMiddle = evaluateExpression(middle);
 					if (valueForMiddle == 0 || Math.abs(valueForMiddle) < 0.000_000_1) {
-						toRetun.add(toAddCloseToWhloeNumber(middle));
+						toRetun.add(toAddCloseToWholeNumber(middle));
 						break;
 					}
 					double valueForStart = evaluateExpression(start);
@@ -311,6 +311,7 @@ public class PostfixExpressionCacl {
 			prev = now;
 		}
 		postfixFunctionArray = originalPostfixExpression;
+		setUpRecognitionArray();
 		if (toRetun.isEmpty()) {
 			return null;
 		} else {
@@ -318,7 +319,7 @@ public class PostfixExpressionCacl {
 		}
 	}
 
-	private double toAddCloseToWhloeNumber(double middle) { // v FXML controlel na 4 des mista, x/4-5, x-5
+	private double toAddCloseToWholeNumber(double middle) { // v FXML controlel na 4 des mista, x/4-5, x-5
 		double close = Math.abs(Math.round(middle) - middle);
 		if (close < 0.000_000_1 && close > -0.000_000_1) { 
 			return Math.round(middle);
