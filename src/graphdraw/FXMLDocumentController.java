@@ -51,6 +51,8 @@ public class FXMLDocumentController {
 		}
 
 		private void draw() {
+			infixTF.setMinWidth(borderPane.getWidth() - 486);
+			calcForVarTF.setMinWidth(borderPane.getWidth());
 			if (gc != null) {
 				reDrawFunctions();
 				drawMouseBox();
@@ -109,6 +111,15 @@ public class FXMLDocumentController {
 	private Stage stage;
 	private int zoom;
 	private boolean amIInInterMode = false;
+	private boolean didUserChangedColor = false;
+	private final Color[] defaultColors = {new Color(26 / 255, 188 / 255, 156 / 255, 1),
+		new Color(46 / 255, 204 / 255, 113 / 255, 1),
+		new Color(52 / 255, 152 / 255, 219 / 255, 1),
+		new Color(155 / 255, 89 / 255, 182 / 255, 1),
+		new Color(243 / 255, 156 / 255, 18 / 255, 1),
+		new Color(211 / 255, 84 / 255, 0 / 255, 1),
+		new Color(192 / 255, 57 / 255, 43 / 255, 1),
+		new Color(127 / 255, 140 / 255, 141 / 255, 1)};
 
 	public void setStage(Stage stage) {
 		ResizableCanvas resizableCanvas = new ResizableCanvas();
@@ -273,6 +284,19 @@ public class FXMLDocumentController {
 				pec.evaluateExpression(2);
 				ArrayList<String> temp = pec.getParsedExpression();
 				if (temp != null) {
+//					if(didUserChangedColor){
+//						boolean change = false;
+//						for (Color defaultColor : defaultColors) {
+//							if (!p.getColors().contains(defaultColor)) {
+//								gc.setStroke(defaultColor);
+//								change = true;
+//							}
+//						}
+//						if(!change){
+//							gc.setStroke(new Color(1, 1, 1, 1));
+//						}
+//						didUserChangedColor = false;
+//					}
 					if (p.addNewEntry(temp, function, variable, (Color) gc.getStroke())) { // diky antiAnalysing zmena barvy je nutne vykreslit nove a ne pres sebe
 						reDrawFunctions();
 						drawMouseBox();
@@ -303,6 +327,7 @@ public class FXMLDocumentController {
 	private void btnColorAction(Event event) {
 		colorDialog.getDialog().showAndWait();
 		gc.setStroke(colorDialog.getCustomColor());
+		didUserChangedColor = true;
 	}
 
 	// DRAWMOUSEBOX !!!!!!!!!!!!!!!! , proc nepouzit obrazek grafu
@@ -485,48 +510,41 @@ public class FXMLDocumentController {
 		drawScale();
 	}
 
+	// zpetne si dopocita souradnice, z zoom hodnot ne cyklus, budouv poly a zpetne se dopocitaci
 	public void drawScale() {
+		double[] pointsToDisplay = { 0.5 ,1,2,5,10,20,30,40,50,70,100};
 		Paint p = gc.getStroke();
 		gc.setStroke(Color.BLACK);
-		double realX = 0;
-		for (double x = -(Canvas.getWidth() / (2 * zoom)); x < (Canvas.getWidth() / (2 * zoom)); x += (0.1 / (double) zoom)) {
-			double distanceFromZero = Math.abs(Math.round(realX) - Canvas.getWidth() / 2);
-			double tempX = Math.abs(Math.round(x * 1000));
-			if (distanceFromZero > 25 && (tempX == 500 || tempX == 1000 || tempX == 2000 || tempX == 5000 || tempX == 10000 || tempX == 20000 || tempX == 30000 || tempX == 50000 || tempX == 70000 || tempX == 100000)) {
-				gc.strokeText(String.valueOf(tempX / 1000.), realX, Canvas.getHeight() / 2 + 14);
-				gc.strokeLine(realX, Canvas.getHeight() / 2 + 5, realX, Canvas.getHeight() / 2 - 5);
+		gc.strokeLine(0, Canvas.getHeight() / 2, Canvas.getWidth(), Canvas.getHeight() / 2);
+		gc.strokeLine(Canvas.getWidth() / 2, 0, Canvas.getWidth() / 2, Canvas.getHeight());
+		gc.strokeText("0", Canvas.getWidth() / 2 + 2, Canvas.getHeight() / 2 + 14);
+		for (int i = 0; i < pointsToDisplay.length; i++) {
+			double distanceFromZero = Math.abs(pointsToDisplay[i]*zoom);
+			if(distanceFromZero>25){
+				gc.strokeText(String.valueOf(pointsToDisplay[i]), pointsToDisplay[i]*zoom+Canvas.getWidth()/2, Canvas.getHeight() / 2 + 14);
+				gc.strokeLine(pointsToDisplay[i]*zoom+Canvas.getWidth()/2, Canvas.getHeight() / 2 + 5, pointsToDisplay[i]*zoom+Canvas.getWidth()/2, Canvas.getHeight() / 2 - 5);
+				gc.strokeText("-"+pointsToDisplay[i], Canvas.getWidth()-(pointsToDisplay[i]*zoom+Canvas.getWidth()/2), Canvas.getHeight() / 2 + 14);
+				gc.strokeLine(Canvas.getWidth()-(pointsToDisplay[i]*zoom+Canvas.getWidth()/2), Canvas.getHeight() / 2 + 5, Canvas.getWidth()-(pointsToDisplay[i]*zoom+Canvas.getWidth()/2), Canvas.getHeight() / 2 - 5);
+				
+				gc.strokeText("-"+String.valueOf(pointsToDisplay[i]), Canvas.getWidth() / 2 - 34, pointsToDisplay[i]*zoom+Canvas.getHeight()/2);
+				gc.strokeLine(Canvas.getWidth() / 2 + 5, pointsToDisplay[i]*zoom+Canvas.getHeight()/2, Canvas.getWidth() / 2 - 5, pointsToDisplay[i]*zoom+Canvas.getHeight()/2);
+				gc.strokeText(String.valueOf(pointsToDisplay[i]), Canvas.getWidth() / 2 - 34, Canvas.getHeight()-(pointsToDisplay[i]*zoom+Canvas.getHeight()/2));
+				gc.strokeLine(Canvas.getWidth() / 2 + 5, Canvas.getHeight()-(pointsToDisplay[i]*zoom+Canvas.getHeight()/2), Canvas.getWidth() / 2 - 5, Canvas.getHeight()-(pointsToDisplay[i]*zoom+Canvas.getHeight()/2));
 			}
-			realX += 0.1;
-		}
-		double realY = 0;
-		for (double y = -(Canvas.getHeight() / (2 * zoom)); y < (Canvas.getHeight() / (2 * zoom)); y += (0.1 / (double) zoom)) {
-			double distanceFromZero = Math.abs(Math.round(realY) - Canvas.getHeight() / 2);
-			double tempY = Math.abs(Math.round(y * 1000));
-			if (distanceFromZero > 25 && (tempY == 500 || tempY == 1000 || tempY == 2000 || tempY == 5000 || tempY == 10000 || tempY == 20000 || tempY == 30000 || tempY == 50000 || tempY == 70000 || tempY == 100000)) {
-				gc.strokeText(String.valueOf(tempY / 1000.), Canvas.getWidth() / 2 - 34, realY);
-				gc.strokeLine(Canvas.getWidth() / 2 + 5, realY, Canvas.getWidth() / 2 - 5, realY);
-			}
-			realY += 0.1;
 		}
 		gc.setStroke(p);
 		try {
 			canvasCopy = Canvas.snapshot(new SnapshotParameters(), null);
-			ImageIO.write(SwingFXUtils.fromFXImage(canvasCopy, null), "png", new File(System.nanoTime() + ".png"));
 		} catch (NullPointerException e) {
-		} catch (IOException ex) {
-			Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
-		}
+		} 
 	}
 
-	// presunout cary
 	private void reset() { // je potreba vubec kreslit okno s X a Y, neiplementova ho do RestBtn, Inizializace a Redraw
 		if (gc != null) {// zavola se driv nez se prida gc, mozna neni problem na windows
 			gc.setFill(Color.WHITE);
 			Color stroke = (Color) gc.getStroke();
 			gc.setStroke(Color.BLACK);
 			gc.fillRect(0, 0, Canvas.getWidth(), Canvas.getHeight());
-			gc.strokeLine(0, Canvas.getHeight() / 2, Canvas.getWidth(), Canvas.getHeight() / 2);
-			gc.strokeLine(Canvas.getWidth() / 2, 0, Canvas.getWidth() / 2, Canvas.getHeight());
 			gc.setStroke(stroke);
 		}
 	}
