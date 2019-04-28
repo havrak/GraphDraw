@@ -30,7 +30,9 @@ public class ParsedExpressions {
 	public Color getColor(int i) {
 		return colors.get(i);
 	}
-
+	public List<Color> getColors(){
+		return colors;
+	}
 	public String getInfixExpression(int i) {
 		return intfixExpressions.get(i);
 	}
@@ -52,23 +54,6 @@ public class ParsedExpressions {
 
 	public int getIndexOfInfixFunction(String infix) {
 		return intfixExpressions.indexOf(infix);
-	}
-
-	/**
-	 * Used for addNewEntry - combines values form postfixExpressionCalc and
-	 * FXMLDocumentControler
-	 *
-	 * @param color
-	 * @param expression
-	 * @param variable
-	 */
-	public ParsedExpressions(Color color, ArrayList<String> expression, String variable) {
-		colors.clear();
-		postfixExpressions.clear();
-		variables.clear();
-		colors.add(color);
-		postfixExpressions.add(expression);
-		variables.add(variable);
 	}
 
 	public ParsedExpressions() {

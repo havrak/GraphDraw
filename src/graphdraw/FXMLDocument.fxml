@@ -37,8 +37,8 @@
             <Button mnemonicParsing="false" onAction="#btnResetPressed" prefHeight="26.0" prefWidth="60.0" text="Reset" />
             <Button mnemonicParsing="false" onAction="#btnColorAction" prefHeight="26.0" prefWidth="60.0" text="Color" />
             <Button mnemonicParsing="false" onAction="#btnHelpPressed" prefHeight="26.0" prefWidth="60.0" text="Help" />
-            <Button fx:id="interBtn" mnemonicParsing="false" onAction="#switchMode" prefWidth="60.0" text="Inter" />
-            <MenuButton mnemonicParsing="false" prefWidth="60.0" text="File">
+            <Button fx:id="interBtn" mnemonicParsing="false" onAction="#switchMode" prefHeight="26.0" prefWidth="60.0" text="Inter" />
+            <MenuButton mnemonicParsing="false" prefHeight="26.0" prefWidth="60.0" text="File">
               <items>
                 <MenuItem mnemonicParsing="false" onAction="#menuSaveAction" text="Save Img" />
                 <MenuItem mnemonicParsing="false" onAction="#menuExportAction" text="Export" />

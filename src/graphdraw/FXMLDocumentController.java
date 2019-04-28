@@ -6,8 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -41,6 +39,9 @@ import javax.imageio.ImageIO;
  *
  * @author havra
  */
+
+
+// draw mouseBox na konic reDrawGraphs
 public class FXMLDocumentController {
 
 	class ResizableCanvas extends Canvas {
@@ -55,7 +56,6 @@ public class FXMLDocumentController {
 			calcForVarTF.setMinWidth(borderPane.getWidth());
 			if (gc != null) {
 				reDrawFunctions();
-				drawMouseBox();
 			}
 		}
 
@@ -112,14 +112,19 @@ public class FXMLDocumentController {
 	private int zoom;
 	private boolean amIInInterMode = false;
 	private boolean didUserChangedColor = false;
-	private final Color[] defaultColors = {new Color(26 / 255, 188 / 255, 156 / 255, 1),
-		new Color(46 / 255, 204 / 255, 113 / 255, 1),
-		new Color(52 / 255, 152 / 255, 219 / 255, 1),
-		new Color(155 / 255, 89 / 255, 182 / 255, 1),
-		new Color(243 / 255, 156 / 255, 18 / 255, 1),
-		new Color(211 / 255, 84 / 255, 0 / 255, 1),
-		new Color(192 / 255, 57 / 255, 43 / 255, 1),
-		new Color(127 / 255, 140 / 255, 141 / 255, 1)};
+
+	private final Color[] defaultColors = {Color.valueOf("0x1abc9cff"),
+		Color.valueOf("0x2ecc71ff"),
+		Color.valueOf("0x3498dbff"),
+		Color.valueOf("0x9b59b6ff"),
+		Color.valueOf("0x34495eff"),
+		Color.valueOf("0xf39c12ff"),
+		Color.valueOf("0xd35400ff"),
+		Color.valueOf("0xc0392bff"),
+		Color.valueOf("0x6d8764ff"),
+		Color.valueOf("0xf472d0ff"),
+		Color.valueOf("0xa0522dff"),
+		Color.valueOf("0x2c3e50ff")};
 
 	public void setStage(Stage stage) {
 		ResizableCanvas resizableCanvas = new ResizableCanvas();
@@ -135,7 +140,7 @@ public class FXMLDocumentController {
 		zoomTF.setText("10");
 		reset();
 		drawScale();
-		drawMouseBox(); // nefunguje
+		drawMouseBox(); 
 	}
 
 	//moveAway
@@ -149,7 +154,6 @@ public class FXMLDocumentController {
 			infixTF.setEditable(false); // udelat pro vse
 			calcForVarTF.setEditable(false);
 			zoomTF.setEditable(false);
-
 		} else { // jdu do modu
 			interBtn.setText("Inter");
 			borderPane.setCenter(pane);
@@ -209,7 +213,6 @@ public class FXMLDocumentController {
 		if (zoom >= 10) {
 			zoom--;
 			reDrawFunctions();
-			drawMouseBox();
 		}
 		zoomTF.setText(String.valueOf(zoom));
 	}
@@ -225,7 +228,6 @@ public class FXMLDocumentController {
 				if (Integer.valueOf(zoomTF.getText()) >= 10 && Integer.valueOf(zoomTF.getText()) <= 100) {
 					zoom = Integer.valueOf(zoomTF.getText());
 					reDrawFunctions();
-					drawMouseBox();
 				} else {
 					zoomTF.setText(String.valueOf(zoom));
 					alert.setTitle("Too big zoom or too small");
@@ -250,12 +252,10 @@ public class FXMLDocumentController {
 			zoom--;
 			zoomTF.setText(String.valueOf(zoom));
 			reDrawFunctions();
-			drawMouseBox();
 		} else if (event.getDeltaY() > 0 && zoom < 100) {
 			zoom++;
 			zoomTF.setText(String.valueOf(zoom));
 			reDrawFunctions();
-			drawMouseBox();
 		}
 	};
 
@@ -282,30 +282,28 @@ public class FXMLDocumentController {
 			} else {
 				pec = new PostfixExpressionCacl(function, variable);
 				pec.evaluateExpression(2);
-				ArrayList<String> temp = pec.getParsedExpression();
+				ArrayList<String> temp = (ArrayList<String>) pec.getParsedExpression().clone();
 				if (temp != null) {
-//					if(didUserChangedColor){
-//						boolean change = false;
-//						for (Color defaultColor : defaultColors) {
-//							if (!p.getColors().contains(defaultColor)) {
-//								gc.setStroke(defaultColor);
-//								change = true;
-//							}
-//						}
-//						if(!change){
-//							gc.setStroke(new Color(1, 1, 1, 1));
-//						}
-//						didUserChangedColor = false;
-//					}
+					if(!didUserChangedColor){
+						boolean change = false;
+						for (Color defaultColor : defaultColors) {
+							if (!p.getColors().contains(defaultColor)) {
+								gc.setStroke(defaultColor);
+								change = true;
+							}
+						}
+						if(!change && p.getSize() ==0){
+							System.out.println(gc.getStroke() + " "+defaultColors[0]);
+						} else if(!change){
+							gc.setStroke(new Color(0,0, 0, 1));
+						}
+						didUserChangedColor = false;
+					}
 					if (p.addNewEntry(temp, function, variable, (Color) gc.getStroke())) { // diky antiAnalysing zmena barvy je nutne vykreslit nove a ne pres sebe
+						System.out.println("ADDING");
 						reDrawFunctions();
-						drawMouseBox();
 					} else {
-						//drawToCanvas(coordinates);
-						//drawScale();
-						//drawMouseBox(); // je namalovany mouse box a ulozi se do obrazku
 						reDrawFunctions();
-						drawMouseBox();
 						Button btn = new Button();
 						btn.setAlignment(Pos.CENTER_LEFT);
 						btn.setMaxWidth(functionChoserBar.getPrefWidth());
@@ -330,13 +328,9 @@ public class FXMLDocumentController {
 		didUserChangedColor = true;
 	}
 
-	// DRAWMOUSEBOX !!!!!!!!!!!!!!!! , proc nepouzit obrazek grafu
-	// locknout blue dot ???????
+	// locknout blue dot ??????? s boolean
 	@FXML
 	private void menuSaveAction(Event event) {
-		//reset();
-		//reDrawFunctions();
-		//WritableImage image = Canvas.snapshot(new SnapshotParameters(), null);
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save Image");
 		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("File type: PNG", "*.png");
@@ -346,7 +340,6 @@ public class FXMLDocumentController {
 		if (!file.getName().endsWith(".png")) {
 			file = new File(file.getAbsolutePath() + ".png");
 		}
-		//drawMouseBox();
 		try {
 			ImageIO.write(SwingFXUtils.fromFXImage(canvasCopy, null), "png", file); // null pointer
 		} catch (IOException ex) {
@@ -393,7 +386,7 @@ public class FXMLDocumentController {
 			variableTF.setText("");
 		}
 	}
-	// nakresli obrazek grafu - ten bide ulozen v image, globani promena, zmenena po kazdem nakreselni
+	// nakresli obrazek grafu - ten bude ulozen v image, globani promena, zmenena po kazdem nakreselni
 	// graphdraw, reDrawGraphs
 	EventHandler<MouseEvent> mouseMovedInCanvas = event -> {
 		if (!p.isEmpty()) { // cheme aby nece bylo ulozeneho ?? pec == null
@@ -439,10 +432,8 @@ public class FXMLDocumentController {
 			infixTF.setText(name);
 			variableTF.setText(p.getVariable(index));
 		} else {// zde se udela cele vypisovani
-			ArrayList<String> pecOut = (ArrayList<String>) pec.getParsedExpression().clone();
 			intersestionModeTA.setText("");
-			System.out.println(p.getPostfixExpression(index) + " " + p.getPostfixExpression(index));
-			List<Double> points = pec.bisectionMethod(p.getPostfixExpression(index), p.getVariable(index), Canvas.getWidth() / zoom, zoom);
+			List<Double> points = pec.bisectionMethod((ArrayList<String>) p.getPostfixExpression(index).clone(), p.getVariable(index), Canvas.getWidth() / zoom, zoom);
 			if (name.equals(infixTF.getText())) {
 				intersestionModeTA.appendText("Vybraly dvě stejné funkce,\n");
 				intersestionModeTA.appendText("sdílejí mezi sebou všechny společné body,\n");
@@ -451,14 +442,11 @@ public class FXMLDocumentController {
 					intersestionModeTA.appendText("Požadované funkce nemají na plátně žádný průnik\n");
 				} else { // mezi funkcemi tou a tou je prunik zde a zde etc.
 					intersestionModeTA.appendText("Funkce: " + function + " a fukce: " + name + ", mají průniky v bodech:\n");
-					pec.setPostfixExpression(pecOut, variable);
-					System.out.println(pecOut + " " + variable + " " + pec.getParsedExpression());
 					points.forEach((point) -> {
-						intersestionModeTA.appendText("[" + String.valueOf((double) ((int) (point * 10000)) / 10000) + "," + String.valueOf((double) ((int) (pec.evaluateExpression(Double.valueOf(point)) * 10000)) / 10000) + "]\n");
+						intersestionModeTA.appendText("[" + String.valueOf((double) ((int) (point * 10000)) / 10000) + "," + String.valueOf((double) ((int) (pec.evaluateExpression(point) * 10000)) / 10000) + "]\n");
 					});
 				}
 			}
-			pec.setPostfixExpression(pecOut, variable);
 		}
 	};
 
@@ -508,6 +496,7 @@ public class FXMLDocumentController {
 			pec.setPostfixExpression(originalPostfix, originalVariable);
 		}
 		drawScale();
+		drawMouseBox();
 	}
 
 	// zpetne si dopocita souradnice, z zoom hodnot ne cyklus, budouv poly a zpetne se dopocitaci
