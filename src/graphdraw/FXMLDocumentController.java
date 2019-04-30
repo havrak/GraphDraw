@@ -41,9 +41,16 @@ import javax.imageio.ImageIO;
  */
 
 
-// draw mouseBox na konic reDrawGraphs
-public class FXMLDocumentController {
+// vyhodit tridu PointsCoordiantes.
 
+public class FXMLDocumentController {
+	
+	/**
+	 * Class Resizable Canavas
+	 * If you bind it with pane, Cancas will be resized
+	 * together with window it self
+	 * 
+	 */
 	class ResizableCanvas extends Canvas {
 
 		public ResizableCanvas() { // mohl by menit i rozmery TextArea a  - pricist k nim Vbox width
@@ -136,14 +143,19 @@ public class FXMLDocumentController {
 		this.colorDialog = new CustomColorDialog(this.stage);
 		gc = Canvas.getGraphicsContext2D();
 		gc.setFont(new Font(10));
-		zoom = 10;
-		zoomTF.setText("10");
+		zoom = 20;
+		zoomTF.setText("1");
 		reset();
 		drawScale();
 		drawMouseBox(); 
 	}
 
-	//moveAway
+	/**
+	 * Method for button switching between Canvas and TextArea for displaying
+	 * Coordinates of intersections. Will also lock certain parts of UI if in intersection mode.
+	 * 
+	 * @param event 
+	 */
 	@FXML
 	private void switchMode(ActionEvent event) {
 		if (!amIInInterMode) { // prejdu do modu, zmenit v Vboxu moznost, moznapredelat na listwiew, asi vlakno - bude fungovat jako terminal TextArea 
@@ -163,7 +175,13 @@ public class FXMLDocumentController {
 			zoomTF.setEditable(true);
 		}
 	}
-
+	
+	
+	/**
+	 * Method for button showing help in Alert.
+	 * 
+	 * @param event 
+	 */
 	@FXML
 	private void btnHelpPressed(ActionEvent event) { // remake
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -180,11 +198,17 @@ public class FXMLDocumentController {
 		alert.getDialogPane().setMinSize(300, 300);
 		alert.showAndWait();
 	}
-
+	
+	
+	/**
+	 * Method for reset button, will set all fields, Canvas etc. to their default state.
+	 * 
+	 * @param event 
+	 */
 	@FXML
 	private void btnResetPressed(ActionEvent event) {
-		zoom = 10;
-		zoomTF.setText("10");
+		zoom = 20;
+		zoomTF.setText("1");
 		variable = "";
 		function = "";
 		calcForVarTF.setText("");
@@ -198,25 +222,42 @@ public class FXMLDocumentController {
 		drawScale();
 		drawMouseBox();
 	}
-
+	
+	
+	/** 
+	 * Increases value of zoom, value is offset by 19.
+	 * 
+	 * @param event 
+	 */
 	@FXML
 	private void btnPlusPressed(ActionEvent event) {
-		if (zoom < 100) {
+		if (zoom < 119) {
 			zoom++;
 			reDrawFunctions();
 		}
-		zoomTF.setText(String.valueOf(zoom));
+		zoomTF.setText(String.valueOf(zoom-19));
 	}
-
+	
+	/** 
+	 * Decreases value of zoom, value is offset by 19.
+	 * 
+	 * @param event 
+	 */
 	@FXML
 	private void btnMinusPressed(ActionEvent event) {
-		if (zoom >= 10) {
+		if (zoom >= 20) {
 			zoom--;
 			reDrawFunctions();
 		}
-		zoomTF.setText(String.valueOf(zoom));
+		zoomTF.setText(String.valueOf(zoom-19));
 	}
-
+	
+	/** 
+	 * Increases or decreases value of zoom, value is offset by 19.
+	 * Throws Alert if value is out of range.
+	 * 
+	 * @param event 
+	 */
 	@FXML
 	private void changeZoomAction(KeyEvent event) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -225,14 +266,14 @@ public class FXMLDocumentController {
 		alert.getDialogPane().setMinSize(330, 130);
 		if (event.getCode().equals(KeyCode.ENTER)) {
 			try {
-				if (Integer.valueOf(zoomTF.getText()) >= 10 && Integer.valueOf(zoomTF.getText()) <= 100) {
-					zoom = Integer.valueOf(zoomTF.getText());
+				if (Integer.valueOf(zoomTF.getText()) >= 1 && Integer.valueOf(zoomTF.getText()) <= 100) {
+					zoom = Integer.valueOf(zoomTF.getText())+19;
 					reDrawFunctions();
 				} else {
 					zoomTF.setText(String.valueOf(zoom));
 					alert.setTitle("Too big zoom or too small");
 					alert.setContentText("Zoom value is out of range.\n"
-							+ "Zoom can only have value between 10 and 100.");
+							+ "Zoom can only have value between 1 and 100.");
 					alert.showAndWait();
 
 				}
@@ -246,15 +287,21 @@ public class FXMLDocumentController {
 
 		}
 	}
-
+	
+	/** 
+	 * Increases or decreases value of zoom, value is offset by 19.
+	 * Throws Aletrt if value is out of range.
+	 * 
+	 * @param event 
+	 */	
 	EventHandler<ScrollEvent> canvasScroll = event -> {
-		if (event.getDeltaY() < 0 && zoom > 10) {
+		if (event.getDeltaY() < 0 && zoom > 20) {
 			zoom--;
-			zoomTF.setText(String.valueOf(zoom));
+			zoomTF.setText(String.valueOf(zoom-19));
 			reDrawFunctions();
-		} else if (event.getDeltaY() > 0 && zoom < 100) {
+		} else if (event.getDeltaY() > 0 && zoom < 119) {
 			zoom++;
-			zoomTF.setText(String.valueOf(zoom));
+			zoomTF.setText(String.valueOf(zoom-19));
 			reDrawFunctions();
 		}
 	};
@@ -265,9 +312,17 @@ public class FXMLDocumentController {
 			calcForVarTF.setText("For value: " + calcForVarTF.getText() + ", f(" + variableTF.getText() + ") = " + String.valueOf(pec.evaluateExpression(Double.valueOf(calcForVarTF.getText()))));
 		}
 	}
-
+	
+	
+	/**
+	 * Method for InfixField, if ENTER is pressed graph will be draw.
+	 * Also will add new function to VBox with functions or chage color of
+	 * already drawn function.
+	 * 
+	 * @param event 
+	 */
 	@FXML
-	private void drawGraphAction(KeyEvent event) throws IOException {
+	private void drawGraphAction(KeyEvent event) {
 		if (event.getCode().equals(KeyCode.ENTER)) {
 			System.out.println("-----------------");
 			double time = System.nanoTime();
@@ -293,14 +348,12 @@ public class FXMLDocumentController {
 							}
 						}
 						if(!change && p.getSize() ==0){
-							System.out.println(gc.getStroke() + " "+defaultColors[0]);
 						} else if(!change){
 							gc.setStroke(new Color(0,0, 0, 1));
 						}
 						didUserChangedColor = false;
 					}
 					if (p.addNewEntry(temp, function, variable, (Color) gc.getStroke())) { // diky antiAnalysing zmena barvy je nutne vykreslit nove a ne pres sebe
-						System.out.println("ADDING");
 						reDrawFunctions();
 					} else {
 						reDrawFunctions();
@@ -320,7 +373,12 @@ public class FXMLDocumentController {
 			System.out.println("-----------------");
 		}
 	}
-
+	
+	/**
+	 * Shows Color dialog to choose graph color
+	 * 
+	 * @param event 
+	 */
 	@FXML
 	private void btnColorAction(Event event) {
 		colorDialog.getDialog().showAndWait();
@@ -328,7 +386,11 @@ public class FXMLDocumentController {
 		didUserChangedColor = true;
 	}
 
-	// locknout blue dot ??????? s boolean
+	/**
+	 * Export Canvas screen shot to picture, will not contain mouse coordinates.
+	 * 
+	 * @param event 
+	 */
 	@FXML
 	private void menuSaveAction(Event event) {
 		FileChooser fileChooser = new FileChooser();
@@ -336,7 +398,6 @@ public class FXMLDocumentController {
 		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("File type: PNG", "*.png");
 		fileChooser.getExtensionFilters().add(extFilter);
 		File file = fileChooser.showSaveDialog(this.stage);
-		System.out.println(file.getName());
 		if (!file.getName().endsWith(".png")) {
 			file = new File(file.getAbsolutePath() + ".png");
 		}
@@ -345,7 +406,12 @@ public class FXMLDocumentController {
 		} catch (IOException ex) {
 		}
 	}
-
+	
+	/**
+	 * Calls method in Parsed Expression to export functions to file.
+	 * 
+	 * @param event 
+	 */
 	@FXML
 	private void menuExportAction(Event event) {
 		FileChooser fileChooser = new FileChooser();
@@ -353,7 +419,13 @@ public class FXMLDocumentController {
 		File file = fileChooser.showSaveDialog(this.stage);
 		p.exportToJSON(file);
 	}
-
+	
+	/**
+	 * Calls method in Parsed Expression to import functions from file.
+	 * If some functions were added will redraw canvas.
+	 * 
+	 * @param event 
+	 */
 	@FXML
 	private void menuImportAction(Event event) {
 		int size = p.getSize();
@@ -378,16 +450,27 @@ public class FXMLDocumentController {
 			variable = p.getVariable(p.getSize() - 1);
 		}
 	}
-
+	
+	/**
+	 * Prevents Variable field to contain more than 1 character.
+	 * 
+	 * @param event 
+	 */
 	@FXML
 	public void keyTypedInVariable(KeyEvent event) {
-		System.out.println(variableTF.getText());
 		if (variableTF.getText().length() > 0) {
 			variableTF.setText("");
 		}
 	}
+	
 	// nakresli obrazek grafu - ten bude ulozen v image, globani promena, zmenena po kazdem nakreselni
 	// graphdraw, reDrawGraphs
+	
+	/**
+	 * Calculates values of function for current mouse position.
+	 * Draw blue dot on chossed graph in place where X position of mouse is same.
+	 * 
+	 */
 	EventHandler<MouseEvent> mouseMovedInCanvas = event -> {
 		if (!p.isEmpty()) { // cheme aby nece bylo ulozeneho ?? pec == null
 			reset();
@@ -420,6 +503,13 @@ public class FXMLDocumentController {
 		}
 	};
 	// nastavit barvu, TextArea, Variable, Postfix
+	
+	/**
+	 * If in normal mode:
+	 *	Sets function for which to calculate value from mouse X.  
+	 * If in intersection mode:
+	 *	Will find intersection and display them.
+	 */
 	EventHandler<ActionEvent> btnChoseFunctionPressed = event -> {
 		Button temp = (Button) event.getSource();
 		String name = temp.getText().split(":")[1];
@@ -449,7 +539,13 @@ public class FXMLDocumentController {
 			}
 		}
 	};
-
+	
+	
+	/**
+	 * Graphs to Canvas
+	 * 
+	 * @param coordinates 
+	 */
 	public void drawToCanvas(PointsCoordinates coordinates) {
 		Point2D point1;
 		Point2D point2;
