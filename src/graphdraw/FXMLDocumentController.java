@@ -326,7 +326,7 @@ public class FXMLDocumentController {
 		if (event.getCode().equals(KeyCode.ENTER)) {
 			System.out.println("-----------------");
 			double time = System.nanoTime();
-			PointsCoordinates coordinates = new PointsCoordinates(new ArrayList<>(), new ArrayList<>());
+			//PointsCoordinates coordinates = new PointsCoordinates(new ArrayList<>(), new ArrayList<>());
 
 			function = infixTF.getText().toLowerCase().trim();
 			variable = variableTF.getText();
@@ -546,19 +546,19 @@ public class FXMLDocumentController {
 	 * 
 	 * @param coordinates 
 	 */
-	public void drawToCanvas(PointsCoordinates coordinates) {
+	public void drawToCanvas(List<Point2D> coordinates) {
 		Point2D point1;
 		Point2D point2;
-		for (int i = 0; i < coordinates.getArrayListLenght() - 1; i++) {
-			point1 = new Point2D(coordinates.getAxisXForI(i) + Canvas.getWidth() / 2, coordinates.getAxisYForI(i) + Canvas.getHeight() / 2);
-			point2 = new Point2D(coordinates.getAxisXForI(i + 1) + Canvas.getWidth() / 2, coordinates.getAxisYForI(i + 1) + Canvas.getHeight() / 2);
+		for (int i = 0; i < coordinates.size() - 1; i++) {
+			point1 = new Point2D(coordinates.get(i).getX() + Canvas.getWidth() / 2, coordinates.get(i).getY() + Canvas.getHeight() / 2);
+			point2 = new Point2D(coordinates.get(i+1).getX()+ Canvas.getWidth() / 2, coordinates.get(i+1).getY() + Canvas.getHeight() / 2);
 
 			if (point1.distance(point2) < zoom * 25) {
 				gc.strokeLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
 			}
 		}
 	}
-
+	
 	// Canvas to Image
 	public void reDrawFunctions() {
 		reset();
@@ -577,13 +577,13 @@ public class FXMLDocumentController {
 			} else {
 				pec.setPostfixExpression(p.getPostfixExpression(i), p.getVariable(i));
 			}
-			PointsCoordinates coordinates = new PointsCoordinates(new ArrayList<>(), new ArrayList<>());
+			List<Point2D> coordinates = new ArrayList<>();
 			for (double x = -(Canvas.getWidth() / (2 * zoom)); x < (Canvas.getWidth() / (2 * zoom)); x += (0.1 / (double) zoom)) {
 				Double d = pec.evaluateExpression(x) * zoom;
 				if (d.isNaN()) {
 					x = Double.POSITIVE_INFINITY;
 				} else {
-					coordinates.AddToMap(x * zoom, d);
+					coordinates.add(new Point2D(x*zoom, -d));
 				}
 			}
 			drawToCanvas(coordinates);
