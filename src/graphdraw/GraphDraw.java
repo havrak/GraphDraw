@@ -12,7 +12,7 @@ import javafx.stage.Stage;
  * @author havra
  */
 public class GraphDraw extends Application {
-    
+ 
     @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("FXMLDocument.fxml"));
@@ -20,11 +20,11 @@ public class GraphDraw extends Application {
         Scene scene = new Scene(root);
         ((FXMLDocumentController)loader.getController()).setStage(stage);
         stage.setTitle("GraphDrawing");
-		stage.getIcons().add(new Image("icon.png"));
+	stage.getIcons().add(new Image("icon.png"));
         stage.setScene(scene);
         stage.show();
-		stage.setMinHeight(626);
-		stage.setMinWidth(800);
+	stage.setMinHeight(626);
+	stage.setMinWidth(800);
         stage.setResizable(true);
     }
 

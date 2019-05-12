@@ -23,12 +23,18 @@ public class PostfixExpressionCacl {
 		parse();
 
 	}
-	public PostfixExpressionCacl(ArrayList<String> postfixFunction, String variable){
+
+	public PostfixExpressionCacl(ArrayList<String> postfixFunction, String variable) {
 		this.postfixFunctionArray = postfixFunction;
 		this.variable = variable;
 		setUpRecognitionArray();
 	}
-	// Shunting-yard algorithm
+
+	/**
+	 * Implementation of shunting yard algorithm output will be saved to
+	 * postfiXFunctionArray
+	 *
+	 */
 	private void parse() {
 		double time = System.nanoTime();
 		OperatorStack stack = new OperatorStack();
@@ -47,8 +53,13 @@ public class PostfixExpressionCacl {
 			char c = infixFunction.charAt(i);
 			if ('a' <= c && c <= 'z') {
 				if (firstLetter) {
+
 					startingIndexOfLetter = i;
 					firstLetter = false;
+				}
+				if ((i != 0 && (Character.isDigit(infixFunction.charAt(i - 1)))) || (i != infixFunction.length() - 1 && (Character.isDigit(infixFunction.charAt(i + 1))))) {
+					errorMessage(String.valueOf(infixFunction.charAt(i - 1)) + String.valueOf(infixFunction.charAt(i)));
+					isExpressionCalculable = false;
 				}
 				wasItALetter = true;
 			} else if (Character.isDigit(infixFunction.charAt(i)) || c == '.') {
@@ -107,6 +118,10 @@ public class PostfixExpressionCacl {
 					postfixFunctionArray.addAll(stack.addToStack(String.valueOf(c)));
 					break;
 				case '(':
+					if (i != 0 && (Character.isDigit(infixFunction.charAt(i - 1))) || infixFunction.charAt(i - 1) == variable.charAt(0)) {
+						errorMessage(String.valueOf(infixFunction.charAt(i - 1)) + "(");
+						isExpressionCalculable = false;
+					}
 					int startingIndex = i + 1;
 					int j = i + 1;
 					boolean stop = false;
@@ -122,11 +137,15 @@ public class PostfixExpressionCacl {
 					}
 					if (stop == false) {
 						String temp = infixFunction.substring(startingIndex, j + 1);
-						i += temp.length() + 1; // z nejakeho duvodu bylo x +2
+						i += temp.length() + 1;
 						postfixFunctionArray.add(temp);
 					}
 					break;
 				case ')':
+					if (i != infixFunction.length() - 1 && (Character.isDigit(infixFunction.charAt(i + 1)))) {
+						errorMessage(String.valueOf(infixFunction.charAt(i - 1)) + String.valueOf(infixFunction.charAt(i)));
+						isExpressionCalculable = false;
+					}
 					List<String> toAdd = stack.rightBracket();
 					if (toAdd == null) {
 						isExpressionCalculable = false;
@@ -147,13 +166,17 @@ public class PostfixExpressionCacl {
 			isExpressionCalculable = false;
 		} else {
 			postfixFunctionArray.addAll(toAdd);
+			setUpRecognitionArray();
 		}
-		setUpRecognitionArray();
+		
 		System.out.println("Parsing took:\t\t" + ((System.nanoTime() - time) / 1000_000) + "ms");
 	}
 
-	// rychlejsi vypocet nedelam s ArrayListem a String u cisel a promenych
-	// lze predelat na double - vice trochu rychlejsi
+	/**
+	 * Will set up recognitionArray, which contains information about type of
+	 * each item in postfixFunctionArray
+	 *
+	 */
 	private void setUpRecognitionArray() {
 		recognitionArray = new char[postfixFunctionArray.size()];
 		for (int i = 0; i < postfixFunctionArray.size(); i++) {
@@ -169,6 +192,13 @@ public class PostfixExpressionCacl {
 		}
 	}
 
+	/**
+	 * Stack based calculation of postfix expression, calculates value for given
+	 * variable.
+	 *
+	 * @param variable
+	 * @return
+	 */
 	public double evaluateExpression(double variable) {
 		if (isExpressionCalculable) {
 			Stack<Double> stack = new Stack<>();
@@ -249,7 +279,7 @@ public class PostfixExpressionCacl {
 								break;
 							default:
 								isExpressionCalculable = false;
-								System.out.println(postfixFunctionArray + " "+ recognitionArray + " "+ this.variable);
+								System.out.println(postfixFunctionArray + " " + recognitionArray + " " + this.variable);
 								errorMessage(postfixFunctionArray.get(i));
 								return Double.NaN;
 						}
@@ -270,8 +300,21 @@ public class PostfixExpressionCacl {
 		}
 	}
 
-	// dostane rozmery obrazovky (x) a zoom
-	// najde pruniky s x
+	/**
+	 * Will find intersection of two functions (current postfixFunctionArray and
+	 * given equation) variable is String of variable used in expression (e.g.
+	 * for f(x) 5*x variable is x), xWidth is real width of screen, zoom is zoom
+	 * variable.
+	 *
+	 * Bisection method is used so intersection is search for only for min and
+	 * max x values currently displayed on Canvas.
+	 *
+	 * @param equation2
+	 * @param variable
+	 * @param xWidth
+	 * @param zoom
+	 * @return
+	 */
 	public List<Double> bisectionMethod(ArrayList<String> equation2, String variable, double xWidth, double zoom) {
 		if (!this.variable.equals(variable)) {
 			for (int i = 0; i < equation2.size(); i++) {
@@ -319,9 +362,16 @@ public class PostfixExpressionCacl {
 		}
 	}
 
+	/**
+	 * Will round up number to whole number if it is close to it, prevents
+	 * displaying things like 0.00000013 instead of 0.
+	 *
+	 * @param middle
+	 * @return
+	 */
 	private double toAddCloseToWholeNumber(double middle) { // v FXML controlel na 4 des mista, x/4-5, x-5
 		double close = Math.abs(Math.round(middle) - middle);
-		if (close < 0.000_000_1 && close > -0.000_000_1) { 
+		if (close < 0.000_000_1 && close > -0.000_000_1) {
 			return Math.round(middle);
 		} else {
 			return middle;
@@ -335,11 +385,22 @@ public class PostfixExpressionCacl {
 		a.showAndWait();
 	}
 
+	/**
+	 * Replaces variables in PostfixExpressionCalc, pretty much works like
+	 * constructor but there is no need to create whole object again.
+	 *
+	 * @param postfixFunctionArray
+	 * @param variable
+	 */
 	public void setPostfixExpression(ArrayList<String> postfixFunctionArray, String variable) {
 		this.variable = variable;
 		this.postfixFunctionArray = postfixFunctionArray;
 		isExpressionCalculable = true;
 		setUpRecognitionArray();
+	}
+
+	public boolean isCalculable() {
+		return isExpressionCalculable;
 	}
 
 	public ArrayList<String> getParsedExpression() {
@@ -348,7 +409,8 @@ public class PostfixExpressionCacl {
 		}
 		return null;
 	}
-	public String getVariable(){
+
+	public String getVariable() {
 		return variable;
 	}
 }

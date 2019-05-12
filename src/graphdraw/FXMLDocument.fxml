@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -56,9 +57,13 @@
       </HBox>
    </bottom>
    <center>
-      <Pane fx:id="pane" minHeight="1.0" minWidth="1.0" prefHeight="548.0" prefWidth="800.0" BorderPane.alignment="CENTER" />
+      <Pane fx:id="pane" minHeight="1.0" minWidth="1.0" prefHeight="548.0" prefWidth="614.0" BorderPane.alignment="CENTER" />
    </center>
    <left>
-      <VBox fx:id="functionChoserBar" prefHeight="548.0" prefWidth="150.0" BorderPane.alignment="CENTER" />
+      <ScrollPane hbarPolicy="NEVER" vbarPolicy="ALWAYS" BorderPane.alignment="CENTER">
+         <content>
+            <VBox fx:id="functionChoserBar" prefHeight="548.0" prefWidth="168.0" />
+         </content>
+      </ScrollPane>
    </left>
 </BorderPane>

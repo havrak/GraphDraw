@@ -1,7 +1,9 @@
 package graphdraw.PostfixExperssionCacl;
 
 /**
- *
+ * Stores date of precedence of different operator
+ * according to rules setup by shunting yard algorithm rules.
+ * 
  * @author havra
  */
 public enum Precedence {

@@ -56,7 +56,7 @@ public class OperatorStack {
 		return toReturn;
 	}
 
-	public String takeFromStack() {
+	private String takeFromStack() {
 		if (!stack.isEmpty()) {
 			String tmp = stack.get(stack.size() - 1);
 			stack.remove(stack.size() - 1);

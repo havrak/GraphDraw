@@ -39,21 +39,17 @@ import javax.imageio.ImageIO;
  *
  * @author havra
  */
-
-
 // vyhodit tridu PointsCoordiantes.
-
 public class FXMLDocumentController {
-	
+
 	/**
-	 * Class Resizable Canavas
-	 * If you bind it with pane, Cancas will be resized
+	 * Class Resizable Canavas If you bind it with pane, Canvas will be resized
 	 * together with window it self
-	 * 
+	 *
 	 */
 	class ResizableCanvas extends Canvas {
 
-		public ResizableCanvas() { // mohl by menit i rozmery TextArea a  - pricist k nim Vbox width
+		public ResizableCanvas() {
 			widthProperty().addListener(evt -> draw());
 			heightProperty().addListener(evt -> draw());
 		}
@@ -147,14 +143,15 @@ public class FXMLDocumentController {
 		zoomTF.setText("1");
 		reset();
 		drawScale();
-		drawMouseBox(); 
+		drawMouseBox();
 	}
 
 	/**
 	 * Method for button switching between Canvas and TextArea for displaying
-	 * Coordinates of intersections. Will also lock certain parts of UI if in intersection mode.
-	 * 
-	 * @param event 
+	 * Coordinates of intersections. Will also lock certain parts of UI if in
+	 * intersection mode.
+	 *
+	 * @param event
 	 */
 	@FXML
 	private void switchMode(ActionEvent event) {
@@ -175,15 +172,14 @@ public class FXMLDocumentController {
 			zoomTF.setEditable(true);
 		}
 	}
-	
-	
+
 	/**
 	 * Method for button showing help in Alert.
-	 * 
-	 * @param event 
+	 *
+	 * @param event
 	 */
 	@FXML
-	private void btnHelpPressed(ActionEvent event) { // remake
+	private void btnHelpPressed(ActionEvent event) { // remake to english
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle("Informace o použití");
 		alert.setHeaderText("Informace o požití");
@@ -198,12 +194,12 @@ public class FXMLDocumentController {
 		alert.getDialogPane().setMinSize(300, 300);
 		alert.showAndWait();
 	}
-	
-	
+
 	/**
-	 * Method for reset button, will set all fields, Canvas etc. to their default state.
-	 * 
-	 * @param event 
+	 * Method for reset button, will set all fields, Canvas etc. to their
+	 * default state.
+	 *
+	 * @param event
 	 */
 	@FXML
 	private void btnResetPressed(ActionEvent event) {
@@ -222,12 +218,11 @@ public class FXMLDocumentController {
 		drawScale();
 		drawMouseBox();
 	}
-	
-	
-	/** 
+
+	/**
 	 * Increases value of zoom, value is offset by 19.
-	 * 
-	 * @param event 
+	 *
+	 * @param event
 	 */
 	@FXML
 	private void btnPlusPressed(ActionEvent event) {
@@ -235,13 +230,13 @@ public class FXMLDocumentController {
 			zoom++;
 			reDrawFunctions();
 		}
-		zoomTF.setText(String.valueOf(zoom-19));
+		zoomTF.setText(String.valueOf(zoom - 19));
 	}
-	
-	/** 
+
+	/**
 	 * Decreases value of zoom, value is offset by 19.
-	 * 
-	 * @param event 
+	 *
+	 * @param event
 	 */
 	@FXML
 	private void btnMinusPressed(ActionEvent event) {
@@ -249,14 +244,14 @@ public class FXMLDocumentController {
 			zoom--;
 			reDrawFunctions();
 		}
-		zoomTF.setText(String.valueOf(zoom-19));
+		zoomTF.setText(String.valueOf(zoom - 19));
 	}
-	
-	/** 
-	 * Increases or decreases value of zoom, value is offset by 19.
-	 * Throws Alert if value is out of range.
-	 * 
-	 * @param event 
+
+	/**
+	 * Increases or decreases value of zoom, value is offset by 19. Throws Alert
+	 * if value is out of range.
+	 *
+	 * @param event
 	 */
 	@FXML
 	private void changeZoomAction(KeyEvent event) {
@@ -267,7 +262,7 @@ public class FXMLDocumentController {
 		if (event.getCode().equals(KeyCode.ENTER)) {
 			try {
 				if (Integer.valueOf(zoomTF.getText()) >= 1 && Integer.valueOf(zoomTF.getText()) <= 100) {
-					zoom = Integer.valueOf(zoomTF.getText())+19;
+					zoom = Integer.valueOf(zoomTF.getText()) + 19;
 					reDrawFunctions();
 				} else {
 					zoomTF.setText(String.valueOf(zoom));
@@ -287,21 +282,21 @@ public class FXMLDocumentController {
 
 		}
 	}
-	
-	/** 
-	 * Increases or decreases value of zoom, value is offset by 19.
-	 * Throws Aletrt if value is out of range.
-	 * 
-	 * @param event 
-	 */	
+
+	/**
+	 * Increases or decreases value of zoom, value is offset by 19. Throws Alert
+	 * if value is out of range.
+	 *
+	 * @param event
+	 */
 	EventHandler<ScrollEvent> canvasScroll = event -> {
 		if (event.getDeltaY() < 0 && zoom > 20) {
 			zoom--;
-			zoomTF.setText(String.valueOf(zoom-19));
+			zoomTF.setText(String.valueOf(zoom - 19));
 			reDrawFunctions();
 		} else if (event.getDeltaY() > 0 && zoom < 119) {
 			zoom++;
-			zoomTF.setText(String.valueOf(zoom-19));
+			zoomTF.setText(String.valueOf(zoom - 19));
 			reDrawFunctions();
 		}
 	};
@@ -312,14 +307,13 @@ public class FXMLDocumentController {
 			calcForVarTF.setText("For value: " + calcForVarTF.getText() + ", f(" + variableTF.getText() + ") = " + String.valueOf(pec.evaluateExpression(Double.valueOf(calcForVarTF.getText()))));
 		}
 	}
-	
-	
+
 	/**
-	 * Method for InfixField, if ENTER is pressed graph will be draw.
-	 * Also will add new function to VBox with functions or chage color of
-	 * already drawn function.
-	 * 
-	 * @param event 
+	 * Method for InfixField, if ENTER is pressed graph will be draw. Also will
+	 * add new function to VBox with functions or chage color of already drawn
+	 * function.
+	 *
+	 * @param event
 	 */
 	@FXML
 	private void drawGraphAction(KeyEvent event) {
@@ -337,34 +331,36 @@ public class FXMLDocumentController {
 			} else {
 				pec = new PostfixExpressionCacl(function, variable);
 				pec.evaluateExpression(2);
-				ArrayList<String> temp = (ArrayList<String>) pec.getParsedExpression().clone();
-				if (temp != null) {
-					if(!didUserChangedColor){
-						boolean change = false;
-						for (Color defaultColor : defaultColors) {
-							if (!p.getColors().contains(defaultColor)) {
-								gc.setStroke(defaultColor);
-								change = true;
+				if (pec.isCalculable()) {
+					ArrayList<String> temp = (ArrayList<String>) pec.getParsedExpression().clone();
+					//if (temp != null) {
+						if (!didUserChangedColor) {
+							boolean change = false;
+							for (Color defaultColor : defaultColors) {
+								if (!p.getColors().contains(defaultColor)) {
+									gc.setStroke(defaultColor);
+									change = true;
+								}
 							}
+							if (!change && p.getSize() == 0) {
+							} else if (!change) {
+								gc.setStroke(new Color(0, 0, 0, 1));
+							}
+							didUserChangedColor = false;
 						}
-						if(!change && p.getSize() ==0){
-						} else if(!change){
-							gc.setStroke(new Color(0,0, 0, 1));
+						if (p.addNewEntry(temp, function, variable, (Color) gc.getStroke())) { // diky antiAnalysing zmena barvy je nutne vykreslit nove a ne pres sebe
+							reDrawFunctions();
+						} else {
+							reDrawFunctions();
+							Button btn = new Button();
+							btn.setAlignment(Pos.CENTER_LEFT);
+							btn.setMaxWidth(functionChoserBar.getPrefWidth());
+							btn.setPrefWidth(functionChoserBar.getPrefWidth());
+							btn.setText("f(" + variable + "):" + function);
+							btn.setOnAction(btnChoseFunctionPressed);
+							functionChoserBar.getChildren().add(btn);
 						}
-						didUserChangedColor = false;
-					}
-					if (p.addNewEntry(temp, function, variable, (Color) gc.getStroke())) { // diky antiAnalysing zmena barvy je nutne vykreslit nove a ne pres sebe
-						reDrawFunctions();
-					} else {
-						reDrawFunctions();
-						Button btn = new Button();
-						btn.setAlignment(Pos.CENTER_LEFT);
-						btn.setMaxWidth(functionChoserBar.getPrefWidth());
-						btn.setPrefWidth(functionChoserBar.getPrefWidth());
-						btn.setText("f(" + variable + "):" + function);
-						btn.setOnAction(btnChoseFunctionPressed);
-						functionChoserBar.getChildren().add(btn);
-					}
+					//}
 				}
 				//canvasCopy = Canvas.snapshot(new SnapshotParameters(), null);
 				System.out.println(p.toString());
@@ -373,11 +369,11 @@ public class FXMLDocumentController {
 			System.out.println("-----------------");
 		}
 	}
-	
+
 	/**
 	 * Shows Color dialog to choose graph color
-	 * 
-	 * @param event 
+	 *
+	 * @param event
 	 */
 	@FXML
 	private void btnColorAction(Event event) {
@@ -388,8 +384,8 @@ public class FXMLDocumentController {
 
 	/**
 	 * Export Canvas screen shot to picture, will not contain mouse coordinates.
-	 * 
-	 * @param event 
+	 *
+	 * @param event
 	 */
 	@FXML
 	private void menuSaveAction(Event event) {
@@ -406,25 +402,25 @@ public class FXMLDocumentController {
 		} catch (IOException ex) {
 		}
 	}
-	
+
 	/**
 	 * Calls method in Parsed Expression to export functions to file.
-	 * 
-	 * @param event 
+	 *
+	 * @param event
 	 */
 	@FXML
-	private void menuExportAction(Event event) {
+	private void menuExportAction(Event event) { // co kdyz jsou ve file data, pridat?????
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Select File");
 		File file = fileChooser.showSaveDialog(this.stage);
 		p.exportToJSON(file);
 	}
-	
+
 	/**
-	 * Calls method in Parsed Expression to import functions from file.
-	 * If some functions were added will redraw canvas.
-	 * 
-	 * @param event 
+	 * Calls method in Parsed Expression to import functions from file. If some
+	 * functions were added will redraw canvas.
+	 *
+	 * @param event
 	 */
 	@FXML
 	private void menuImportAction(Event event) {
@@ -450,11 +446,11 @@ public class FXMLDocumentController {
 			variable = p.getVariable(p.getSize() - 1);
 		}
 	}
-	
+
 	/**
 	 * Prevents Variable field to contain more than 1 character.
-	 * 
-	 * @param event 
+	 *
+	 * @param event
 	 */
 	@FXML
 	public void keyTypedInVariable(KeyEvent event) {
@@ -462,14 +458,11 @@ public class FXMLDocumentController {
 			variableTF.setText("");
 		}
 	}
-	
-	// nakresli obrazek grafu - ten bude ulozen v image, globani promena, zmenena po kazdem nakreselni
-	// graphdraw, reDrawGraphs
-	
+
 	/**
-	 * Calculates values of function for current mouse position.
-	 * Draw blue dot on chossed graph in place where X position of mouse is same.
-	 * 
+	 * Calculates values of function for current mouse position. Draw blue dot
+	 * on selected graph in place where X position of mouse is same.
+	 *
 	 */
 	EventHandler<MouseEvent> mouseMovedInCanvas = event -> {
 		if (!p.isEmpty()) { // cheme aby nece bylo ulozeneho ?? pec == null
@@ -502,13 +495,10 @@ public class FXMLDocumentController {
 			gc.setStroke(c);
 		}
 	};
-	// nastavit barvu, TextArea, Variable, Postfix
-	
+
 	/**
-	 * If in normal mode:
-	 *	Sets function for which to calculate value from mouse X.  
-	 * If in intersection mode:
-	 *	Will find intersection and display them.
+	 * If in normal mode: Sets function for which to calculate value from mouse
+	 * X. If in intersection mode: Will find intersection and display them.
 	 */
 	EventHandler<ActionEvent> btnChoseFunctionPressed = event -> {
 		Button temp = (Button) event.getSource();
@@ -523,49 +513,54 @@ public class FXMLDocumentController {
 			variableTF.setText(p.getVariable(index));
 		} else {// zde se udela cele vypisovani
 			intersestionModeTA.setText("");
-			List<Double> points = pec.bisectionMethod((ArrayList<String>) p.getPostfixExpression(index).clone(), p.getVariable(index), Canvas.getWidth() / zoom, zoom);
 			if (name.equals(infixTF.getText())) {
+				List<Double> points = pec.bisectionMethod(new ArrayList<String>(), pec.getVariable(), Canvas.getWidth() / zoom, zoom);
 				intersestionModeTA.appendText("Vybraly dvě stejné funkce,\n");
-				intersestionModeTA.appendText("sdílejí mezi sebou všechny společné body,\n");
+				intersestionModeTA.appendText("zobrazuji body, kde funkce protíná osu X:\n");
+				points.forEach((point) -> {
+					intersestionModeTA.appendText("[" + String.valueOf((double) ((int) (point * 10000)) / 10000) + " ; 0 ]\n");
+				});
 			} else {
+				List<Double> points = pec.bisectionMethod((ArrayList<String>) p.getPostfixExpression(index).clone(), p.getVariable(index), Canvas.getWidth() / zoom, zoom);
 				if (points == null) {
 					intersestionModeTA.appendText("Požadované funkce nemají na plátně žádný průnik\n");
 				} else { // mezi funkcemi tou a tou je prunik zde a zde etc.
 					intersestionModeTA.appendText("Funkce: " + function + " a fukce: " + name + ", mají průniky v bodech:\n");
 					points.forEach((point) -> {
-						intersestionModeTA.appendText("[" + String.valueOf((double) ((int) (point * 10000)) / 10000) + "," + String.valueOf((double) ((int) (pec.evaluateExpression(point) * 10000)) / 10000) + "]\n");
+						intersestionModeTA.appendText("[ " + String.valueOf((double) ((int) (point * 10000)) / 10000) + " ; " + String.valueOf((double) ((int) (pec.evaluateExpression(point) * 10000)) / 10000) + " ]\n");
 					});
 				}
 			}
 		}
 	};
-	
-	
+
 	/**
-	 * Graphs to Canvas
-	 * 
-	 * @param coordinates 
+	 * Draws points for List in succession.
+	 *
+	 * @param coordinates
 	 */
 	public void drawToCanvas(List<Point2D> coordinates) {
 		Point2D point1;
 		Point2D point2;
 		for (int i = 0; i < coordinates.size() - 1; i++) {
 			point1 = new Point2D(coordinates.get(i).getX() + Canvas.getWidth() / 2, coordinates.get(i).getY() + Canvas.getHeight() / 2);
-			point2 = new Point2D(coordinates.get(i+1).getX()+ Canvas.getWidth() / 2, coordinates.get(i+1).getY() + Canvas.getHeight() / 2);
+			point2 = new Point2D(coordinates.get(i + 1).getX() + Canvas.getWidth() / 2, coordinates.get(i + 1).getY() + Canvas.getHeight() / 2);
 
 			if (point1.distance(point2) < zoom * 25) {
 				gc.strokeLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
 			}
 		}
 	}
-	
-	// Canvas to Image
+
+	/**
+	 * Redraws all graphs saved in parsedExpression
+	 */
 	public void reDrawFunctions() {
 		reset();
 		boolean needToReturn = false;
 		ArrayList<String> originalPostfix = null;
 		String originalVariable = null;
-		if (pec != null) { // v pripade ze uzivatel hned importuje, bez toho aby neco nakreslil
+		if (pec != null && pec.isCalculable() ) { // v pripade ze uzivatel hned importuje, bez toho aby neco nakreslil
 			originalPostfix = pec.getParsedExpression();
 			originalVariable = pec.getVariable();
 			needToReturn = true;
@@ -583,7 +578,7 @@ public class FXMLDocumentController {
 				if (d.isNaN()) {
 					x = Double.POSITIVE_INFINITY;
 				} else {
-					coordinates.add(new Point2D(x*zoom, -d));
+					coordinates.add(new Point2D(x * zoom, -d));
 				}
 			}
 			drawToCanvas(coordinates);
@@ -595,36 +590,38 @@ public class FXMLDocumentController {
 		drawMouseBox();
 	}
 
-	// zpetne si dopocita souradnice, z zoom hodnot ne cyklus, budouv poly a zpetne se dopocitaci
+	/**
+	 * Draws scale to canvas according to current zoom value.
+	 */
 	public void drawScale() {
-		double[] pointsToDisplay = { 0.5 ,1,2,5,10,20,30,40,50,70,100};
-		Paint p = gc.getStroke();
+		double[] pointsToDisplay = {0.5, 1, 2, 5, 10, 20, 30, 40, 50, 70, 100};
+		Paint paintToRestore = gc.getStroke();
 		gc.setStroke(Color.BLACK);
 		gc.strokeLine(0, Canvas.getHeight() / 2, Canvas.getWidth(), Canvas.getHeight() / 2);
 		gc.strokeLine(Canvas.getWidth() / 2, 0, Canvas.getWidth() / 2, Canvas.getHeight());
 		gc.strokeText("0", Canvas.getWidth() / 2 + 2, Canvas.getHeight() / 2 + 14);
 		for (int i = 0; i < pointsToDisplay.length; i++) {
-			double distanceFromZero = Math.abs(pointsToDisplay[i]*zoom);
-			if(distanceFromZero>25){
-				gc.strokeText(String.valueOf(pointsToDisplay[i]), pointsToDisplay[i]*zoom+Canvas.getWidth()/2, Canvas.getHeight() / 2 + 14);
-				gc.strokeLine(pointsToDisplay[i]*zoom+Canvas.getWidth()/2, Canvas.getHeight() / 2 + 5, pointsToDisplay[i]*zoom+Canvas.getWidth()/2, Canvas.getHeight() / 2 - 5);
-				gc.strokeText("-"+pointsToDisplay[i], Canvas.getWidth()-(pointsToDisplay[i]*zoom+Canvas.getWidth()/2), Canvas.getHeight() / 2 + 14);
-				gc.strokeLine(Canvas.getWidth()-(pointsToDisplay[i]*zoom+Canvas.getWidth()/2), Canvas.getHeight() / 2 + 5, Canvas.getWidth()-(pointsToDisplay[i]*zoom+Canvas.getWidth()/2), Canvas.getHeight() / 2 - 5);
-				
-				gc.strokeText("-"+String.valueOf(pointsToDisplay[i]), Canvas.getWidth() / 2 - 34, pointsToDisplay[i]*zoom+Canvas.getHeight()/2);
-				gc.strokeLine(Canvas.getWidth() / 2 + 5, pointsToDisplay[i]*zoom+Canvas.getHeight()/2, Canvas.getWidth() / 2 - 5, pointsToDisplay[i]*zoom+Canvas.getHeight()/2);
-				gc.strokeText(String.valueOf(pointsToDisplay[i]), Canvas.getWidth() / 2 - 34, Canvas.getHeight()-(pointsToDisplay[i]*zoom+Canvas.getHeight()/2));
-				gc.strokeLine(Canvas.getWidth() / 2 + 5, Canvas.getHeight()-(pointsToDisplay[i]*zoom+Canvas.getHeight()/2), Canvas.getWidth() / 2 - 5, Canvas.getHeight()-(pointsToDisplay[i]*zoom+Canvas.getHeight()/2));
+			double distanceFromZero = Math.abs(pointsToDisplay[i] * zoom);
+			if (distanceFromZero > 25) {
+				gc.strokeText(String.valueOf(pointsToDisplay[i]), pointsToDisplay[i] * zoom + Canvas.getWidth() / 2, Canvas.getHeight() / 2 + 14);
+				gc.strokeLine(pointsToDisplay[i] * zoom + Canvas.getWidth() / 2, Canvas.getHeight() / 2 + 5, pointsToDisplay[i] * zoom + Canvas.getWidth() / 2, Canvas.getHeight() / 2 - 5);
+				gc.strokeText("-" + pointsToDisplay[i], Canvas.getWidth() - (pointsToDisplay[i] * zoom + Canvas.getWidth() / 2), Canvas.getHeight() / 2 + 14);
+				gc.strokeLine(Canvas.getWidth() - (pointsToDisplay[i] * zoom + Canvas.getWidth() / 2), Canvas.getHeight() / 2 + 5, Canvas.getWidth() - (pointsToDisplay[i] * zoom + Canvas.getWidth() / 2), Canvas.getHeight() / 2 - 5);
+
+				gc.strokeText("-" + String.valueOf(pointsToDisplay[i]), Canvas.getWidth() / 2 - 34, pointsToDisplay[i] * zoom + Canvas.getHeight() / 2);
+				gc.strokeLine(Canvas.getWidth() / 2 + 5, pointsToDisplay[i] * zoom + Canvas.getHeight() / 2, Canvas.getWidth() / 2 - 5, pointsToDisplay[i] * zoom + Canvas.getHeight() / 2);
+				gc.strokeText(String.valueOf(pointsToDisplay[i]), Canvas.getWidth() / 2 - 34, Canvas.getHeight() - (pointsToDisplay[i] * zoom + Canvas.getHeight() / 2));
+				gc.strokeLine(Canvas.getWidth() / 2 + 5, Canvas.getHeight() - (pointsToDisplay[i] * zoom + Canvas.getHeight() / 2), Canvas.getWidth() / 2 - 5, Canvas.getHeight() - (pointsToDisplay[i] * zoom + Canvas.getHeight() / 2));
 			}
 		}
-		gc.setStroke(p);
+		gc.setStroke(paintToRestore);
 		try {
 			canvasCopy = Canvas.snapshot(new SnapshotParameters(), null);
 		} catch (NullPointerException e) {
-		} 
+		}
 	}
 
-	private void reset() { // je potreba vubec kreslit okno s X a Y, neiplementova ho do RestBtn, Inizializace a Redraw
+	private void reset() {
 		if (gc != null) {// zavola se driv nez se prida gc, mozna neni problem na windows
 			gc.setFill(Color.WHITE);
 			Color stroke = (Color) gc.getStroke();
