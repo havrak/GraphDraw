@@ -26,7 +26,7 @@
                   <Font size="12.0" />
                </font>
             </TextField>
-            <Label maxWidth="15.0" minWidth="15.0" prefWidth="15.0" text="):">
+            <Label maxWidth="26.0" minWidth="15.0" prefHeight="24.0" prefWidth="26.0" text=")=">
                <font>
                   <Font size="19.0" />
                </font>

@@ -156,6 +156,9 @@ public class PostfixExpressionCacl {
 				case ',':
 					postfixFunctionArray.addAll(stack.commaFound());
 					break;
+				case '|':
+					errorMessage("|");
+					isExpressionCalculable = false;
 				default:
 					break;
 			}
@@ -168,7 +171,7 @@ public class PostfixExpressionCacl {
 			postfixFunctionArray.addAll(toAdd);
 			setUpRecognitionArray();
 		}
-		
+
 		System.out.println("Parsing took:\t\t" + ((System.nanoTime() - time) / 1000_000) + "ms");
 	}
 
@@ -271,6 +274,9 @@ public class PostfixExpressionCacl {
 							case "log":
 								stack.push(Math.log10(stack.pop()));
 								break;
+							case "sqrt":
+								stack.push(Math.sqrt(stack.pop()));
+								break;
 							case "ceil":
 								stack.push(Math.ceil(stack.pop()));
 								break;
@@ -320,7 +326,9 @@ public class PostfixExpressionCacl {
 			for (int i = 0; i < equation2.size(); i++) {
 				if (equation2.get(i).equals(variable)) {
 					equation2.set(i, this.variable);
-				}
+				}else if(equation2.get(i).equals("-"+variable)){
+					equation2.set(i, "-"+this.variable);
+				}		
 			}
 		}
 		ArrayList<String> originalPostfixExpression = (ArrayList<String>) postfixFunctionArray.clone();
@@ -332,7 +340,7 @@ public class PostfixExpressionCacl {
 		for (double i = -(xWidth / 2); i < (xWidth / 2); i += (1 / (double) zoom)) { // nenapadl me lepsi zpusob, najde priblizne body zmeny, uzivatel si hold trochu pocka, co kdyz lezi na ose???
 			double now = evaluateExpression(i);
 			if (now == 0) {
-				toRetun.add(toAddCloseToWholeNumber(i));
+				toRetun.add(roundIfCloseToWholeNumber(i));
 			} else if ((prev < 0 && now > 0) || (prev > 0 && now < 0)) {
 				double start = i - (1 / (double) zoom);
 				double end = i;
@@ -340,7 +348,7 @@ public class PostfixExpressionCacl {
 					double middle = (start + end) / 2;
 					double valueForMiddle = evaluateExpression(middle);
 					if (valueForMiddle == 0 || Math.abs(valueForMiddle) < 0.000_000_1) {
-						toRetun.add(toAddCloseToWholeNumber(middle));
+						toRetun.add(roundIfCloseToWholeNumber(middle));
 						break;
 					}
 					double valueForStart = evaluateExpression(start);
@@ -369,9 +377,9 @@ public class PostfixExpressionCacl {
 	 * @param middle
 	 * @return
 	 */
-	private double toAddCloseToWholeNumber(double middle) { // v FXML controlel na 4 des mista, x/4-5, x-5
+	private double roundIfCloseToWholeNumber(double middle) {
 		double close = Math.abs(Math.round(middle) - middle);
-		if (close < 0.000_000_1 && close > -0.000_000_1) {
+		if (close < 0.000_01 && close > -0.000_01) {
 			return Math.round(middle);
 		} else {
 			return middle;

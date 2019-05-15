@@ -24,7 +24,7 @@ public class GraphDraw extends Application {
         stage.setScene(scene);
         stage.show();
 	stage.setMinHeight(626);
-	stage.setMinWidth(800);
+	stage.setMinWidth(806);
         stage.setResizable(true);
     }
 

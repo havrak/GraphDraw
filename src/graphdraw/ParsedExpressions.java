@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.control.Alert;
 import javafx.scene.paint.Color;
 import org.json.*;
 
@@ -53,6 +54,10 @@ public class ParsedExpressions {
 
 	public boolean isEmpty() {
 		return colors.isEmpty();
+	}
+
+	public boolean containsInfix(String contains) {
+		return intfixExpressions.contains(contains);
 	}
 
 	public int getIndexOfInfixFunction(String infix) {
@@ -145,7 +150,7 @@ public class ParsedExpressions {
 				String postfixToAdd = arr.getJSONObject(i).getString("postfix");
 				String variableToAdd = arr.getJSONObject(i).getString("variable");
 				String colorToAdd = arr.getJSONObject(i).getString("color");
-				if (infixToAdd != null && postfixToAdd != null && variableToAdd != null && colorToAdd != null) { // zkotrolovat podminku  
+				if (infixToAdd != null && postfixToAdd != null && variableToAdd != null && colorToAdd != null) {
 					ArrayList<String> postfix = new ArrayList<>();
 					postfix.addAll(Arrays.asList(postfixToAdd.split(", ")));
 					PostfixExpressionCacl temp = new PostfixExpressionCacl(postfix, variableToAdd);
@@ -154,21 +159,32 @@ public class ParsedExpressions {
 						try {
 							colorToAdd = "0x" + colorToAdd.substring(1, 7).toLowerCase() + "ff";
 							Color c = Color.valueOf(colorToAdd);
-							colors.add(c);
-							postfixExpressions.add(postfix);
-							intfixExpressions.add(infixToAdd);
-							variables.add(variableToAdd);
+							//colors.add(c);
+							//postfixExpressions.add(postfix);
+							//intfixExpressions.add(infixToAdd);
+							//variables.add(variableToAdd);
+							addNewEntry(postfix, infixToAdd, variableToAdd, c);
 							wasThereAChange = true;
 						} catch (IllegalArgumentException e) {
-							// wrong color alert
+							alertForImporting(infixToAdd);
 						}
+					} else {
+						alertForImporting(infixToAdd);
 					}
 				} else {
-					// hodit alert
+					alertForImporting(infixToAdd);
 				}
 			}
 			return wasThereAChange;
 		}
 		return false;
+	}
+
+	private void alertForImporting(String infinx) {
+		Alert alert = new Alert(Alert.AlertType.ERROR);
+		alert.setTitle("Error");
+		alert.setHeaderText("Wrong input");
+		alert.setContentText("Function: " + infinx + " is invalid");
+		alert.showAndWait();
 	}
 }

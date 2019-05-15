@@ -44,39 +44,24 @@ public class FXMLDocumentController {
 
 	/**
 	 * Class Resizable Canavas If you bind it with pane, Canvas will be resized
-	 * together with window it self
+	 * together with window itself
 	 *
 	 */
 	class ResizableCanvas extends Canvas {
 
 		public ResizableCanvas() {
-			widthProperty().addListener(evt -> draw());
-			heightProperty().addListener(evt -> draw());
+			widthProperty().addListener(e -> update());
+			heightProperty().addListener(e -> update());
 		}
 
-		private void draw() {
-			infixTF.setMinWidth(borderPane.getWidth() - 486);
+		private void update() {
+			infixTF.setMinWidth(borderPane.getWidth() - 497);
 			calcForVarTF.setMinWidth(borderPane.getWidth());
 			if (gc != null) {
 				reDrawFunctions();
 			}
 		}
-
-		@Override
-		public boolean isResizable() {
-			return true;
-		}
-
-		@Override
-		public double prefWidth(double height) {
-			return getWidth();
-		}
-
-		@Override
-		public double prefHeight(double width) {
-			return getHeight();
-		}
-
+		
 		public void bindWIthParent(Pane parent) {
 			parent.getChildren().add(this);
 			this.widthProperty().bind(parent.widthProperty());
@@ -109,7 +94,7 @@ public class FXMLDocumentController {
 
 	private CustomColorDialog colorDialog;
 	private GraphicsContext gc;
-	public String function; // aktualne vybrana funkce
+	public String function;
 	public String variable;
 	private Stage stage;
 	private int zoom;
@@ -155,21 +140,19 @@ public class FXMLDocumentController {
 	 */
 	@FXML
 	private void switchMode(ActionEvent event) {
-		if (!amIInInterMode) { // prejdu do modu, zmenit v Vboxu moznost, moznapredelat na listwiew, asi vlakno - bude fungovat jako terminal TextArea 
+		if (!amIInInterMode) {
 			interBtn.setText("Back");
 			borderPane.setCenter(intersestionModeTA);
 			intersestionModeTA.setText("");
 			amIInInterMode = true;
 			infixTF.setEditable(false); // udelat pro vse
 			calcForVarTF.setEditable(false);
-			zoomTF.setEditable(false);
-		} else { // jdu do modu
+		} else {
 			interBtn.setText("Inter");
 			borderPane.setCenter(pane);
 			amIInInterMode = false;
 			infixTF.setEditable(true);
 			calcForVarTF.setEditable(true);
-			zoomTF.setEditable(true);
 		}
 	}
 
@@ -181,16 +164,16 @@ public class FXMLDocumentController {
 	@FXML
 	private void btnHelpPressed(ActionEvent event) { // remake to english
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
-		alert.setTitle("Informace o použití");
-		alert.setHeaderText("Informace o požití");
-		alert.setContentText("Zadejte proměnou do políčka v levém horném rohu a funkci do vedlejšího políčka, pro zobrazení grafu stiskněte ENTER\n"
-				+ "- proměná může být jakékoliv písmeno až na písmeno e, neboť to náleží kontantě e (e \u2250 2,71)\n"
-				+ "- podporované konstsnty jsou e, \u03C0, \uD835\uDF19 \n"
-				+ "- pro zadání funkce zadejte FUNKCE(VÝRAZ)\n"
-				+ "- podporavené funkce jsou: sin, tan, cos, asin, atan, acos, abs, ln, exp, floor, ceil, log (base 10)"
-				+ "- min a max jsou také podoporované, ty berou dva argumenty oddělené čárkou\n"
-				+ "- pro mocninu zadejte: ZÁKLAD^EXPONENT\n"
-				+ "- pro odmocninu zadejte: ZÁKLAD^(1/ODMOCNITEL)");
+		alert.setTitle("Information");
+		alert.setHeaderText("Usage info");
+		alert.setContentText("Enter variable to top left field, than write functions itself\n"
+				+ "- variable can be any letter, except letter e (e \u2250 2,71)\n"
+				+ "- supported constants are e, \u03C0, \uD835\uDF19 \n"
+				+ "- if you want to enter function,  enter: function(it's arguments)\n"
+				+ "- supported functions are: sin, tan, cos, asin, atan, acos, abs, ln, exp, floor, ceil, log (base 10), sqrt"
+				+ "- min a max are also supported, these two take two arguments separeted by comma\n"
+				+ "- for power enter: base^power\n"
+				+ "- if you want to use root, write fraction in exponet of power");
 		alert.getDialogPane().setMinSize(300, 300);
 		alert.showAndWait();
 	}
@@ -320,7 +303,6 @@ public class FXMLDocumentController {
 		if (event.getCode().equals(KeyCode.ENTER)) {
 			System.out.println("-----------------");
 			double time = System.nanoTime();
-			//PointsCoordinates coordinates = new PointsCoordinates(new ArrayList<>(), new ArrayList<>());
 
 			function = infixTF.getText().toLowerCase().trim();
 			variable = variableTF.getText();
@@ -333,36 +315,38 @@ public class FXMLDocumentController {
 				pec.evaluateExpression(2);
 				if (pec.isCalculable()) {
 					ArrayList<String> temp = (ArrayList<String>) pec.getParsedExpression().clone();
-					//if (temp != null) {
-						if (!didUserChangedColor) {
-							boolean change = false;
-							for (Color defaultColor : defaultColors) {
-								if (!p.getColors().contains(defaultColor)) {
-									gc.setStroke(defaultColor);
-									change = true;
-								}
+					if (!didUserChangedColor) {
+						boolean change = false;
+						for (Color defaultColor : defaultColors) {
+							if (!p.getColors().contains(defaultColor)) {
+								gc.setStroke(defaultColor);
+								change = true;
 							}
-							if (!change && p.getSize() == 0) {
-							} else if (!change) {
-								gc.setStroke(new Color(0, 0, 0, 1));
-							}
-							didUserChangedColor = false;
 						}
-						if (p.addNewEntry(temp, function, variable, (Color) gc.getStroke())) { // diky antiAnalysing zmena barvy je nutne vykreslit nove a ne pres sebe
-							reDrawFunctions();
-						} else {
-							reDrawFunctions();
-							Button btn = new Button();
-							btn.setAlignment(Pos.CENTER_LEFT);
-							btn.setMaxWidth(functionChoserBar.getPrefWidth());
-							btn.setPrefWidth(functionChoserBar.getPrefWidth());
-							btn.setText("f(" + variable + "):" + function);
-							btn.setOnAction(btnChoseFunctionPressed);
-							functionChoserBar.getChildren().add(btn);
+						if (!change && p.getSize() == 0) {
+						} else if (!change) {
+							gc.setStroke(new Color(0, 0, 0, 1));
 						}
-					//}
+					}
+					if(p.containsInfix(function)){
+						if(didUserChangedColor == true){
+							p.addNewEntry(temp, function, variable, (Color) gc.getStroke());
+							reDrawFunctions();
+						}
+						
+					}else{
+						p.addNewEntry(temp, function, variable, (Color) gc.getStroke());
+						reDrawFunctions();
+						Button btn = new Button();
+						btn.setAlignment(Pos.CENTER_LEFT);
+						btn.setMaxWidth(functionChoserBar.getPrefWidth());
+						btn.setPrefWidth(functionChoserBar.getPrefWidth());
+						btn.setText("f(" + variable + "):" + function);
+						btn.setOnAction(btnChoseFunctionPressed);
+						functionChoserBar.getChildren().add(btn);
+					}
+					didUserChangedColor = false;
 				}
-				//canvasCopy = Canvas.snapshot(new SnapshotParameters(), null);
 				System.out.println(p.toString());
 				System.out.println("Time:\t" + (System.nanoTime() - time) / 1000_000 + "ms");
 			}
@@ -462,7 +446,7 @@ public class FXMLDocumentController {
 	/**
 	 * Calculates values of function for current mouse position. Draw blue dot
 	 * on selected graph in place where X position of mouse is same.
-	 *
+	 * evaluateExpression
 	 */
 	EventHandler<MouseEvent> mouseMovedInCanvas = event -> {
 		if (!p.isEmpty()) { // cheme aby nece bylo ulozeneho ?? pec == null
@@ -511,21 +495,21 @@ public class FXMLDocumentController {
 			variable = p.getVariable(index);
 			infixTF.setText(name);
 			variableTF.setText(p.getVariable(index));
-		} else {// zde se udela cele vypisovani
+		} else {
 			intersestionModeTA.setText("");
 			if (name.equals(infixTF.getText())) {
 				List<Double> points = pec.bisectionMethod(new ArrayList<String>(), pec.getVariable(), Canvas.getWidth() / zoom, zoom);
-				intersestionModeTA.appendText("Vybraly dvě stejné funkce,\n");
-				intersestionModeTA.appendText("zobrazuji body, kde funkce protíná osu X:\n");
+				intersestionModeTA.appendText("You chose two same functions,\n");
+				intersestionModeTA.appendText("showing point where function intersects axis X:\n");
 				points.forEach((point) -> {
 					intersestionModeTA.appendText("[" + String.valueOf((double) ((int) (point * 10000)) / 10000) + " ; 0 ]\n");
 				});
 			} else {
 				List<Double> points = pec.bisectionMethod((ArrayList<String>) p.getPostfixExpression(index).clone(), p.getVariable(index), Canvas.getWidth() / zoom, zoom);
 				if (points == null) {
-					intersestionModeTA.appendText("Požadované funkce nemají na plátně žádný průnik\n");
+					intersestionModeTA.appendText("Requested functions don't have any intersections\n");
 				} else { // mezi funkcemi tou a tou je prunik zde a zde etc.
-					intersestionModeTA.appendText("Funkce: " + function + " a fukce: " + name + ", mají průniky v bodech:\n");
+					intersestionModeTA.appendText("Function: " + function + " and function: " + name + ", are intersectiong in:\n");
 					points.forEach((point) -> {
 						intersestionModeTA.appendText("[ " + String.valueOf((double) ((int) (point * 10000)) / 10000) + " ; " + String.valueOf((double) ((int) (pec.evaluateExpression(point) * 10000)) / 10000) + " ]\n");
 					});
@@ -555,12 +539,12 @@ public class FXMLDocumentController {
 	/**
 	 * Redraws all graphs saved in parsedExpression
 	 */
-	public void reDrawFunctions() {
+	public synchronized void reDrawFunctions() {
 		reset();
 		boolean needToReturn = false;
 		ArrayList<String> originalPostfix = null;
 		String originalVariable = null;
-		if (pec != null && pec.isCalculable() ) { // v pripade ze uzivatel hned importuje, bez toho aby neco nakreslil
+		if (pec != null && pec.isCalculable()) {
 			originalPostfix = pec.getParsedExpression();
 			originalVariable = pec.getVariable();
 			needToReturn = true;
@@ -575,11 +559,7 @@ public class FXMLDocumentController {
 			List<Point2D> coordinates = new ArrayList<>();
 			for (double x = -(Canvas.getWidth() / (2 * zoom)); x < (Canvas.getWidth() / (2 * zoom)); x += (0.1 / (double) zoom)) {
 				Double d = pec.evaluateExpression(x) * zoom;
-				if (d.isNaN()) {
-					x = Double.POSITIVE_INFINITY;
-				} else {
-					coordinates.add(new Point2D(x * zoom, -d));
-				}
+				coordinates.add(new Point2D(x * zoom, -d));
 			}
 			drawToCanvas(coordinates);
 		}
@@ -622,7 +602,7 @@ public class FXMLDocumentController {
 	}
 
 	private void reset() {
-		if (gc != null) {// zavola se driv nez se prida gc, mozna neni problem na windows
+		if (gc != null) {
 			gc.setFill(Color.WHITE);
 			Color stroke = (Color) gc.getStroke();
 			gc.setStroke(Color.BLACK);
@@ -630,7 +610,7 @@ public class FXMLDocumentController {
 			gc.setStroke(stroke);
 		}
 	}
-
+	
 	private void drawMouseBox() {
 		if (gc != null) {
 			gc.setStroke(Color.BLACK);
@@ -643,3 +623,4 @@ public class FXMLDocumentController {
 		}
 	}
 }
+
