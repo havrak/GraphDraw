@@ -6,7 +6,8 @@ import java.util.Stack;
 import javafx.scene.control.Alert;
 
 /**
- *
+ * Class for calculating value of expression
+ * 
  * @author havra
  */
 public class PostfixExpressionCacl {
@@ -16,14 +17,25 @@ public class PostfixExpressionCacl {
 	char[] recognitionArray;
 	String variable;
 	boolean isExpressionCalculable = true;
-
+	
+	/**
+	 * Constructor for unparsed  infix expression
+	 * 
+	 * @param infixFunction
+	 * @param variable 
+	 */
 	public PostfixExpressionCacl(String infixFunction, String variable) {
 		this.infixFunction = infixFunction + " "; // diky zpusobu jakym je algoritmus zapsany nebral posledni string -> nejlehci zpusob jak to vyresit
 		this.variable = variable;
 		parse();
 
 	}
-
+	/**
+	 * Constructor for parsed  postfix expression
+	 * 
+	 * @param postfixFunction
+	 * @param variable 
+	 */
 	public PostfixExpressionCacl(ArrayList<String> postfixFunction, String variable) {
 		this.postfixFunctionArray = postfixFunction;
 		this.variable = variable;

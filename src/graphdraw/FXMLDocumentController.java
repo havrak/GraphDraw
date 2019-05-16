@@ -39,7 +39,6 @@ import javax.imageio.ImageIO;
  *
  * @author havra
  */
-// vyhodit tridu PointsCoordiantes.
 public class FXMLDocumentController {
 
 	/**

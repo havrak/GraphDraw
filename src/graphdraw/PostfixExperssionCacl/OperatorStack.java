@@ -5,7 +5,8 @@ import java.util.List;
 import javafx.scene.control.Alert;
 
 /**
- *
+ * Representation of operator stack for Shunting yard
+ * 
  * @author havra
  */
 public class OperatorStack {

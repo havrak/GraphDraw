@@ -17,7 +17,7 @@ import javafx.scene.paint.Color;
 import org.json.*;
 
 /**
- *
+ * Class for storing expression, you can add new with addNewEntry
  *
  * @author havra
  */
@@ -155,14 +155,10 @@ public class ParsedExpressions {
 					postfix.addAll(Arrays.asList(postfixToAdd.split(", ")));
 					PostfixExpressionCacl temp = new PostfixExpressionCacl(postfix, variableToAdd);
 					temp.evaluateExpression(2);
-					if (temp.getParsedExpression() != null) { // alert
+					if (temp.getParsedExpression() != null) {
 						try {
 							colorToAdd = "0x" + colorToAdd.substring(1, 7).toLowerCase() + "ff";
 							Color c = Color.valueOf(colorToAdd);
-							//colors.add(c);
-							//postfixExpressions.add(postfix);
-							//intfixExpressions.add(infixToAdd);
-							//variables.add(variableToAdd);
 							addNewEntry(postfix, infixToAdd, variableToAdd, c);
 							wasThereAChange = true;
 						} catch (IllegalArgumentException e) {
