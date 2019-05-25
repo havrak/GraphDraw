@@ -6,11 +6,6 @@ import java.util.Stack;
 import javafx.scene.control.Alert;
 
 /**
- * This program is free software. It comes without any warranty, to the extent
- * permitted by applicable law. You can redistribute it and/or modify it under
- * the terms of the Do What The Fuck You Want To Public License, Version 2, as
- * published by Sam Hocevar. See http://www.wtfpl.net/ for more details.
- *
  * Class for calculating value of expression
  *
  * @author havra
@@ -160,11 +155,11 @@ public class PostfixExpressionCacl {
 						if (j+1 != infixFunction.length() - 1 && (Character.isDigit(infixFunction.charAt(j + 2)))) {
 							errorMessage(")"+infixFunction.charAt(j+2) );
 							isExpressionCalculable = false;
-						} 
+						}
 						String temp = infixFunction.substring(startingIndex, j + 1);
 						i += temp.length() + 1;
 						postfixFunctionArray.add(temp);
-						
+
 					}
 					break;
 				case ')':

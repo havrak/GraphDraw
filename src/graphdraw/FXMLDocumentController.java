@@ -36,12 +36,7 @@ import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 
 /**
- * This program is free software. It comes without any warranty, to
- * the extent permitted by applicable law. You can redistribute it
- * and/or modify it under the terms of the Do What The Fuck You Want
- * To Public License, Version 2, as published by Sam Hocevar. See
- * http://www.wtfpl.net/ for more details.
- * 
+ *
  * @author havra
  */
 public class FXMLDocumentController {
@@ -65,7 +60,7 @@ public class FXMLDocumentController {
 				reDrawFunctions();
 			}
 		}
-		
+
 		public void bindWIthParent(Pane parent) {
 			parent.getChildren().add(this);
 			this.widthProperty().bind(parent.widthProperty());
@@ -338,7 +333,7 @@ public class FXMLDocumentController {
 							p.addNewEntry(temp, function, variable, (Color) gc.getStroke());
 							reDrawFunctions();
 						}
-						
+
 					}else{
 						p.addNewEntry(temp, function, variable, (Color) gc.getStroke());
 						reDrawFunctions();
@@ -617,7 +612,7 @@ public class FXMLDocumentController {
 			gc.setStroke(stroke);
 		}
 	}
-	
+
 	private void drawMouseBox() {
 		if (gc != null) {
 			gc.setStroke(Color.BLACK);

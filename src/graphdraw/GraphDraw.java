@@ -8,16 +8,11 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
- * This program is free software. It comes without any warranty, to
- * the extent permitted by applicable law. You can redistribute it
- * and/or modify it under the terms of the Do What The Fuck You Want
- * To Public License, Version 2, as published by Sam Hocevar. See
- * http://www.wtfpl.net/ for more details.
- * 
+ *
  * @author havra
 */
 public class GraphDraw extends Application {
- 
+
     @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("FXMLDocument.fxml"));
@@ -36,5 +31,5 @@ public class GraphDraw extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-    
+
 }
