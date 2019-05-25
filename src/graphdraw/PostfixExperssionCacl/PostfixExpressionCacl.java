@@ -6,8 +6,13 @@ import java.util.Stack;
 import javafx.scene.control.Alert;
 
 /**
+ * This program is free software. It comes without any warranty, to the extent
+ * permitted by applicable law. You can redistribute it and/or modify it under
+ * the terms of the Do What The Fuck You Want To Public License, Version 2, as
+ * published by Sam Hocevar. See http://www.wtfpl.net/ for more details.
+ *
  * Class for calculating value of expression
- * 
+ *
  * @author havra
  */
 public class PostfixExpressionCacl {
@@ -17,12 +22,12 @@ public class PostfixExpressionCacl {
 	char[] recognitionArray;
 	String variable;
 	boolean isExpressionCalculable = true;
-	
+
 	/**
-	 * Constructor for unparsed  infix expression
-	 * 
+	 * Constructor for unparsed infix expression
+	 *
 	 * @param infixFunction
-	 * @param variable 
+	 * @param variable
 	 */
 	public PostfixExpressionCacl(String infixFunction, String variable) {
 		this.infixFunction = infixFunction + " "; // diky zpusobu jakym je algoritmus zapsany nebral posledni string -> nejlehci zpusob jak to vyresit
@@ -30,11 +35,12 @@ public class PostfixExpressionCacl {
 		parse();
 
 	}
+
 	/**
-	 * Constructor for parsed  postfix expression
-	 * 
+	 * Constructor for parsed postfix expression
+	 *
 	 * @param postfixFunction
-	 * @param variable 
+	 * @param variable
 	 */
 	public PostfixExpressionCacl(ArrayList<String> postfixFunction, String variable) {
 		this.postfixFunctionArray = postfixFunction;
@@ -69,8 +75,12 @@ public class PostfixExpressionCacl {
 					startingIndexOfLetter = i;
 					firstLetter = false;
 				}
-				if ((i != 0 && (Character.isDigit(infixFunction.charAt(i - 1)))) || (i != infixFunction.length() - 1 && (Character.isDigit(infixFunction.charAt(i + 1))))) {
+				if (i != 0 && (Character.isDigit(infixFunction.charAt(i - 1)))) {
 					errorMessage(String.valueOf(infixFunction.charAt(i - 1)) + String.valueOf(infixFunction.charAt(i)));
+					isExpressionCalculable = false;
+				}
+				if (i != infixFunction.length() - 1 && (Character.isDigit(infixFunction.charAt(i + 1)))) {
+					errorMessage(String.valueOf(infixFunction.charAt(i)) + String.valueOf(infixFunction.charAt(i + 1)));
 					isExpressionCalculable = false;
 				}
 				wasItALetter = true;
@@ -120,7 +130,6 @@ public class PostfixExpressionCacl {
 				}
 				firstLetter = true;
 			}
-
 			switch (c) {
 				case '*':
 				case '+':
@@ -148,14 +157,19 @@ public class PostfixExpressionCacl {
 						j++;
 					}
 					if (stop == false) {
+						if (j+1 != infixFunction.length() - 1 && (Character.isDigit(infixFunction.charAt(j + 2)))) {
+							errorMessage(")"+infixFunction.charAt(j+2) );
+							isExpressionCalculable = false;
+						} 
 						String temp = infixFunction.substring(startingIndex, j + 1);
 						i += temp.length() + 1;
 						postfixFunctionArray.add(temp);
+						
 					}
 					break;
 				case ')':
 					if (i != infixFunction.length() - 1 && (Character.isDigit(infixFunction.charAt(i + 1)))) {
-						errorMessage(String.valueOf(infixFunction.charAt(i - 1)) + String.valueOf(infixFunction.charAt(i)));
+						errorMessage(String.valueOf(infixFunction.charAt(i)) + String.valueOf(infixFunction.charAt(i) + 1));
 						isExpressionCalculable = false;
 					}
 					List<String> toAdd = stack.rightBracket();
@@ -304,7 +318,7 @@ public class PostfixExpressionCacl {
 						break;
 				}
 			}
-			if (!stack.isEmpty()) {
+			if (stack.size() ==1) {
 				return stack.pop();
 			} else {
 				Alert a = new Alert(Alert.AlertType.ERROR);
@@ -338,9 +352,9 @@ public class PostfixExpressionCacl {
 			for (int i = 0; i < equation2.size(); i++) {
 				if (equation2.get(i).equals(variable)) {
 					equation2.set(i, this.variable);
-				}else if(equation2.get(i).equals("-"+variable)){
-					equation2.set(i, "-"+this.variable);
-				}		
+				} else if (equation2.get(i).equals("-" + variable)) {
+					equation2.set(i, "-" + this.variable);
+				}
 			}
 		}
 		ArrayList<String> originalPostfixExpression = (ArrayList<String>) postfixFunctionArray.clone();

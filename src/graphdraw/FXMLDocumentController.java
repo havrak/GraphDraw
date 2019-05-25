@@ -36,7 +36,12 @@ import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 
 /**
- *
+ * This program is free software. It comes without any warranty, to
+ * the extent permitted by applicable law. You can redistribute it
+ * and/or modify it under the terms of the Do What The Fuck You Want
+ * To Public License, Version 2, as published by Sam Hocevar. See
+ * http://www.wtfpl.net/ for more details.
+ * 
  * @author havra
  */
 public class FXMLDocumentController {
@@ -143,6 +148,7 @@ public class FXMLDocumentController {
 			interBtn.setText("Back");
 			borderPane.setCenter(intersestionModeTA);
 			intersestionModeTA.setText("");
+			intersestionModeTA.setEditable(false);
 			amIInInterMode = true;
 			infixTF.setEditable(false); // udelat pro vse
 			calcForVarTF.setEditable(false);
@@ -495,6 +501,7 @@ public class FXMLDocumentController {
 			infixTF.setText(name);
 			variableTF.setText(p.getVariable(index));
 		} else {
+			intersestionModeTA.setEditable(true);
 			intersestionModeTA.setText("");
 			if (name.equals(infixTF.getText())) {
 				List<Double> points = pec.bisectionMethod(new ArrayList<String>(), pec.getVariable(), Canvas.getWidth() / zoom, zoom);
@@ -507,13 +514,14 @@ public class FXMLDocumentController {
 				List<Double> points = pec.bisectionMethod((ArrayList<String>) p.getPostfixExpression(index).clone(), p.getVariable(index), Canvas.getWidth() / zoom, zoom);
 				if (points == null) {
 					intersestionModeTA.appendText("Requested functions don't have any intersections\n");
-				} else { // mezi funkcemi tou a tou je prunik zde a zde etc.
-					intersestionModeTA.appendText("Function: " + function + " and function: " + name + ", are intersectiong in:\n");
+				} else {
+					intersestionModeTA.appendText("Function: " + function + " and function: " + name + ", have intersection/s in:\n");
 					points.forEach((point) -> {
 						intersestionModeTA.appendText("[ " + String.valueOf((double) ((int) (point * 10000)) / 10000) + " ; " + String.valueOf((double) ((int) (pec.evaluateExpression(point) * 10000)) / 10000) + " ]\n");
 					});
 				}
 			}
+			intersestionModeTA.setEditable(false);
 		}
 	};
 
