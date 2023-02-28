@@ -1,4 +1,13 @@
-My school project for 1st year of high school.
-JavaFX application for drawing graphs of mathematical functions. Also contains
-postfix evaluator for expressions.
+= GraphDraw=
+
+Simple javaFX application for drawing graphs of mathematical functions of single real variable.
+
+== Features ==
+* draw multiple graphs at the same time
+* calculate intersections
+* calculate function value for given variable value
+* export functions to JSON to import later
+
+![screenshot](documentation/img/layout.png)
+
 

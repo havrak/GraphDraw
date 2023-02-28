@@ -1,6 +1,7 @@
 package graphdraw.PostfixExperssionCacl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import javafx.scene.control.Alert;
@@ -25,7 +26,7 @@ public class PostfixExpressionCacl {
 	 * @param variable
 	 */
 	public PostfixExpressionCacl(String infixFunction, String variable) {
-		this.infixFunction = infixFunction + " "; // diky zpusobu jakym je algoritmus zapsany nebral posledni string -> nejlehci zpusob jak to vyresit
+		this.infixFunction = infixFunction + " "; // diky zpusobu jakym je algoritmus zapsany nebral posledni charakter -> nejlehci zpusob jak to vyresit
 		this.variable = variable;
 		parse();
 
@@ -105,14 +106,19 @@ public class PostfixExpressionCacl {
 						}
 						break;
 					case 2:
-						if (temp.equals("pi")) {
-							postfixFunctionArray.add(String.valueOf(Math.PI));
-						} else if (temp.equals("ln")) {
-							stack.basicAdd(temp);
-						} else {
-							errorMessage(temp);
+						switch (temp) {
+							case "pi":
+								postfixFunctionArray.add(String.valueOf(Math.PI));
+								break;
+							case "ln":
+								stack.basicAdd(temp);
+								break;
+							default:
+								errorMessage(temp);
+								break;
 						}
 						break;
+
 					case 3:
 						if (temp.equals("phi")) {
 							postfixFunctionArray.add("1.618033988749895");
@@ -134,10 +140,6 @@ public class PostfixExpressionCacl {
 					postfixFunctionArray.addAll(stack.addToStack(String.valueOf(c)));
 					break;
 				case '(':
-					if (i != 0 && (Character.isDigit(infixFunction.charAt(i - 1))) || infixFunction.charAt(i - 1) == variable.charAt(0)) {
-						errorMessage(String.valueOf(infixFunction.charAt(i - 1)) + "(");
-						isExpressionCalculable = false;
-					}
 					int startingIndex = i + 1;
 					int j = i + 1;
 					boolean stop = false;
@@ -152,8 +154,8 @@ public class PostfixExpressionCacl {
 						j++;
 					}
 					if (stop == false) {
-						if (j+1 != infixFunction.length() - 1 && (Character.isDigit(infixFunction.charAt(j + 2)))) {
-							errorMessage(")"+infixFunction.charAt(j+2) );
+						if (j + 1 != infixFunction.length() - 1 && (Character.isDigit(infixFunction.charAt(j + 2)))) {
+							errorMessage(")" + infixFunction.charAt(j + 2));
 							isExpressionCalculable = false;
 						}
 						String temp = infixFunction.substring(startingIndex, j + 1);
@@ -198,7 +200,8 @@ public class PostfixExpressionCacl {
 
 	/**
 	 * Will set up recognitionArray, which contains information about type of
-	 * each item in postfixFunctionArray
+	 * each item in postfixFunctionArray, speeds up calculation. Makes
+	 * difference since each expression its evaluated many times.
 	 *
 	 */
 	private void setUpRecognitionArray() {
@@ -306,14 +309,14 @@ public class PostfixExpressionCacl {
 								break;
 							default:
 								isExpressionCalculable = false;
-								System.out.println(postfixFunctionArray + " " + recognitionArray + " " + this.variable);
+								System.out.println(postfixFunctionArray + " " + Arrays.toString(recognitionArray) + " " + this.variable);
 								errorMessage(postfixFunctionArray.get(i));
 								return Double.NaN;
 						}
 						break;
 				}
 			}
-			if (stack.size() ==1) {
+			if (stack.size() == 1) {
 				return stack.pop();
 			} else {
 				Alert a = new Alert(Alert.AlertType.ERROR);
@@ -325,6 +328,98 @@ public class PostfixExpressionCacl {
 		} else {
 			return Double.NaN;
 		}
+	}
+	//
+	public double evaluateInfixExpression(ArrayList<String> prefixFunctionArray,double variable) {
+		if(((prefixFunctionArray.get(prefixFunctionArray.size() - 1).equals("-") && prefixFunctionArray.get(prefixFunctionArray.size() - 1).length() >= 2) || (Character.isDigit(prefixFunctionArray.get(prefixFunctionArray.size() - 1).charAt(0))) || prefixFunctionArray.get(prefixFunctionArray.size() - 1).charAt(0) == '.') && !((prefixFunctionArray.get(prefixFunctionArray.size() - 2).equals("-") && prefixFunctionArray.get(prefixFunctionArray.size() - 2).length() >= 2) || (Character.isDigit(prefixFunctionArray.get(prefixFunctionArray.size() - 2).charAt(0))) || prefixFunctionArray.get(prefixFunctionArray.size() - 2).charAt(0) == '.')){
+			prefixFunctionArray.add("0"); // vyhodnocuji jako postfix, je potreba na konce pridat nulu, aby se mohla provest operace, lehce zprasene, ale nevadi, nevim jestli jsem nerozbyl volani funkci (asi ne), ale ty stejne nejsou soucasti ukolu
+		}
+		Stack<Double> stack = new Stack<>();
+		for (int i = prefixFunctionArray.size() - 1; i < 0; i++) {
+			if (prefixFunctionArray.get(i).equals("-" + this.variable)) {
+				stack.push(variable * -1);
+			} else if (prefixFunctionArray.get(i).equals(this.variable)) {
+				stack.push(variable);
+			} else if ((prefixFunctionArray.get(i).equals("-") && prefixFunctionArray.get(i).length() >= 2) || (Character.isDigit(prefixFunctionArray.get(i).charAt(0))) || prefixFunctionArray.get(i).charAt(0) == '.') {
+				stack.push(Double.parseDouble(prefixFunctionArray.get(i)));
+			} else {
+				switch (prefixFunctionArray.get(i)) {
+					case "tan":
+						stack.push(Math.tan(stack.pop()));
+						break;
+					case "atan":
+						stack.push(Math.atan(stack.pop()));
+						break;
+					case "sin":
+						stack.push(Math.sin(stack.pop()));
+						break;
+					case "asin":
+						stack.push(Math.asin(stack.pop()));
+						break;
+					case "cos":
+						stack.push(Math.cos(stack.pop()));
+						break;
+					case "acos":
+						stack.push(Math.acos(stack.pop()));
+						break;
+					case "abs":
+						stack.push(Math.abs(stack.pop()));
+						break;
+					case "^":
+						stack.push(Math.pow(stack.pop(), stack.pop()));
+						break;
+					case "/":
+						stack.push(stack.pop() / stack.pop());
+						break;
+					case "*":
+						stack.push(stack.pop() * stack.pop());
+						break;
+					case "+":
+						stack.push(stack.pop() + stack.pop());
+						break;
+					case "-":
+						stack.push(stack.pop() - stack.pop());
+						break;
+					case "max":
+						stack.push(Math.max(stack.pop(), stack.pop()));
+						break;
+					case "min":
+						stack.push(Math.min(stack.pop(), stack.pop()));
+						break;
+					case "exp":
+						stack.push(Math.exp(stack.pop()));
+						break;
+					case "log":
+						stack.push(Math.log10(stack.pop()));
+						break;
+					case "sqrt":
+						stack.push(Math.sqrt(stack.pop()));
+						break;
+					case "ceil":
+						stack.push(Math.ceil(stack.pop()));
+						break;
+					case "floor":
+						stack.push(Math.floor(stack.pop()));
+						break;
+					default:
+						isExpressionCalculable = false;
+						System.out.println(prefixFunctionArray + " " + Arrays.toString(recognitionArray) + " " + this.variable);
+						errorMessage(prefixFunctionArray.get(i));
+						return Double.NaN;
+				}
+				break;
+			}
+		}
+		if (stack.size() == 1) {
+			return stack.pop();
+		} else {
+			Alert a = new Alert(Alert.AlertType.ERROR);
+			a.setTitle("Error");
+			a.setHeaderText("Error occured during calculation, wrong input");
+			isExpressionCalculable = false;
+			return Double.NaN;
+		}
+
 	}
 
 	/**
@@ -358,7 +453,7 @@ public class PostfixExpressionCacl {
 		setUpRecognitionArray();
 		double prev = evaluateExpression(-xWidth / 2);
 		List<Double> toRetun = new ArrayList<>();
-		for (double i = -(xWidth / 2); i < (xWidth / 2); i += (1 / (double) zoom)) { // nenapadl me lepsi zpusob, najde priblizne body zmeny, uzivatel si hold trochu pocka, co kdyz lezi na ose???
+		for (double i = -(xWidth / 2); i < (xWidth / 2); i += (1 / (double) zoom)) { // nenapadl me lepsi zpusob, najde priblizne body zmeny, uzivatel si hold trochu pocka
 			double now = evaluateExpression(i);
 			if (now == 0) {
 				toRetun.add(roundIfCloseToWholeNumber(i));
@@ -442,4 +537,10 @@ public class PostfixExpressionCacl {
 	public String getVariable() {
 		return variable;
 	}
+//	public static void main(String[] args) {
+//		PostfixExpressionCacl s = new PostfixExpressionCacl("((3+4*5)-6*(7-8-9))*2", "x");
+//		System.out.println("asdas" + s.getParsedExpression());
+//
+//
+//	}
 }

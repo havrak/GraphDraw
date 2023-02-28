@@ -1,6 +1,6 @@
 package graphdraw;
 
-import com.sun.javafx.scene.control.skin.CustomColorDialog;
+import javafx.scene.control.ColorPicker;
 import graphdraw.PostfixExperssionCacl.PostfixExpressionCacl;
 import java.io.File;
 import java.io.IOException;
@@ -85,13 +85,16 @@ public class FXMLDocumentController {
 	private BorderPane borderPane;
 	@FXML
 	private Button interBtn;
+  @FXML
+  private ColorPicker colorPicker;
+  
 
 	private TextArea intersestionModeTA = new TextArea();
 	private PostfixExpressionCacl pec;
 	private ParsedExpressions p = new ParsedExpressions();
 	private Image canvasCopy;
 
-	private CustomColorDialog colorDialog;
+
 	private GraphicsContext gc;
 	public String function;
 	public String variable;
@@ -120,7 +123,7 @@ public class FXMLDocumentController {
 		resizableCanvas.setOnScroll(canvasScroll);
 		this.Canvas = resizableCanvas;
 		this.stage = stage;
-		this.colorDialog = new CustomColorDialog(this.stage);
+    
 		gc = Canvas.getGraphicsContext2D();
 		gc.setFont(new Font(10));
 		zoom = 20;
@@ -306,9 +309,14 @@ public class FXMLDocumentController {
 
 			function = infixTF.getText().toLowerCase().trim();
 			variable = variableTF.getText();
+      if(variable.isEmpty()){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+				alert.setHeaderText("No variable chosen");
+				alert.showAndWait();
+      }
 			if (!(variable.charAt(0) >= 'a' && variable.charAt(0) <= 'z')) {
 				Alert alert = new Alert(Alert.AlertType.ERROR);
-				alert.setHeaderText("Alert can be only letter");
+				alert.setHeaderText("Variable can be only letter");
 				alert.showAndWait();
 			} else {
 				pec = new PostfixExpressionCacl(function, variable);
@@ -360,9 +368,8 @@ public class FXMLDocumentController {
 	 * @param event
 	 */
 	@FXML
-	private void btnColorAction(Event event) {
-		colorDialog.getDialog().showAndWait();
-		gc.setStroke(colorDialog.getCustomColor());
+	private void colorPickerAction(Event event) {
+		gc.setStroke(colorPicker.getValue());
 		didUserChangedColor = true;
 	}
 
