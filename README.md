@@ -1,8 +1,8 @@
-= GraphDraw=
+# GraphDraw
 
 Simple javaFX application for drawing graphs of mathematical functions of single real variable.
 
-== Features ==
+## Features
 * draw multiple graphs at the same time
 * calculate intersections
 * calculate function value for given variable value
